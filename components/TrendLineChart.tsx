@@ -9,25 +9,34 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import { formatPace } from "@/lib/aggregate";
 
 export interface TrendPoint {
   x: string;
   y: number | null;
 }
 
+// Server Components can't pass functions to Client Components, so the page
+// picks a formatter by name and the function itself lives here.
+export type TrendFormat = "pace" | "integer";
+
+const FORMATTERS: Record<TrendFormat, (v: number) => string> = {
+  pace: (v) => formatPace(v),
+  integer: (v) => String(Math.round(v)),
+};
+
 export function TrendLineChart({
   data,
   color = "var(--series-1)",
-  formatY,
-  formatX,
+  format,
   unit,
 }: {
   data: TrendPoint[];
   color?: string;
-  formatY: (v: number) => string;
-  formatX?: (v: string) => string;
+  format: TrendFormat;
   unit?: string;
 }) {
+  const formatY = FORMATTERS[format];
   const clean = data.filter((d) => d.y !== null);
 
   if (clean.length === 0) {
@@ -52,7 +61,6 @@ export function TrendLineChart({
           />
           <XAxis
             dataKey="x"
-            tickFormatter={formatX}
             tick={{ fontSize: 11, fill: "var(--text-muted)" }}
             axisLine={{ stroke: "var(--baseline)" }}
             tickLine={false}
@@ -70,7 +78,6 @@ export function TrendLineChart({
               `${formatY(value)}${unit ? " " + unit : ""}`,
               undefined,
             ]}
-            labelFormatter={(label) => (formatX ? formatX(label) : label)}
             contentStyle={{
               background: "var(--surface-1)",
               border: "1px solid var(--border-hairline)",

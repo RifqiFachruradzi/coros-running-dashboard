@@ -73,7 +73,7 @@ export default async function DashboardPage() {
           <TrendLineChart
             data={paceSeries}
             color="var(--series-1)"
-            formatY={(v) => formatPace(v)}
+            format="pace"
             unit="/km"
           />
         </ChartCard>
@@ -81,7 +81,7 @@ export default async function DashboardPage() {
           <TrendLineChart
             data={hrSeries}
             color="var(--series-3)"
-            formatY={(v) => String(Math.round(v))}
+            format="integer"
             unit="bpm"
           />
         </ChartCard>
@@ -131,7 +131,7 @@ export default async function DashboardPage() {
             <TrendLineChart
               data={restingHrSeries}
               color="var(--series-3)"
-              formatY={(v) => String(Math.round(v))}
+              format="integer"
               unit="bpm"
             />
           </ChartCard>
@@ -139,14 +139,14 @@ export default async function DashboardPage() {
             <TrendLineChart
               data={sleepSeries}
               color="var(--series-5)"
-              formatY={(v) => String(Math.round(v))}
+              format="integer"
             />
           </ChartCard>
           <ChartCard title="Stress level" subtitle="Rata-rata harian">
             <TrendLineChart
               data={stressSeries}
               color="var(--series-4)"
-              formatY={(v) => String(Math.round(v))}
+              format="integer"
             />
           </ChartCard>
         </div>
