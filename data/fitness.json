@@ -1,0 +1,14 @@
+[
+  {
+    "date": "2026-09-15",
+    "vo2max": 46,
+    "runningLevel": 72,
+    "thresholdPaceSecPerKm": 318,
+    "predictions": {
+      "fiveKmSeconds": 1529,
+      "tenKmSeconds": 3203,
+      "halfMarathonSeconds": 7246,
+      "marathonSeconds": 15436
+    }
+  }
+]

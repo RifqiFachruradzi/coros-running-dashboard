@@ -1,0 +1,74 @@
+[
+  {
+    "labelId": "480300327464108238",
+    "sportType": 100,
+    "date": "2026-09-13",
+    "startTimestamp": 1789255290,
+    "location": "East Jakarta Run",
+    "durationSeconds": 2731,
+    "distanceKm": 5.04,
+    "avgPaceSecPerKm": 542,
+    "avgHeartRate": 139,
+    "calories": 374
+  },
+  {
+    "labelId": "480300327464108234",
+    "sportType": 100,
+    "date": "2026-09-13",
+    "startTimestamp": 1789254984,
+    "location": "East Jakarta Run",
+    "durationSeconds": 281,
+    "distanceKm": 0.506,
+    "avgPaceSecPerKm": 555,
+    "avgHeartRate": 119,
+    "calories": 29
+  },
+  {
+    "labelId": "480196193568194562",
+    "sportType": 100,
+    "date": "2026-09-08",
+    "startTimestamp": 1788867456,
+    "location": "East Jakarta Run",
+    "durationSeconds": 2666,
+    "distanceKm": 5.16,
+    "avgPaceSecPerKm": 517,
+    "avgHeartRate": 153,
+    "calories": 426
+  },
+  {
+    "labelId": "480114566909427821",
+    "sportType": 100,
+    "date": "2026-09-05",
+    "startTimestamp": 1788563603,
+    "location": "East Jakarta Run",
+    "durationSeconds": 2382,
+    "distanceKm": 5.01,
+    "avgPaceSecPerKm": 475,
+    "avgHeartRate": 155,
+    "calories": 383
+  },
+  {
+    "labelId": "479952720722165765",
+    "sportType": 100,
+    "date": "2026-08-29",
+    "startTimestamp": 1787960490,
+    "location": "North Jakarta Run",
+    "durationSeconds": 2515,
+    "distanceKm": 5.03,
+    "avgPaceSecPerKm": 500,
+    "avgHeartRate": 150,
+    "calories": 327
+  },
+  {
+    "labelId": "479860040168145301",
+    "sportType": 100,
+    "date": "2026-08-25",
+    "startTimestamp": 1787615941,
+    "location": "Central Jakarta Run",
+    "durationSeconds": 1527,
+    "distanceKm": 2.79,
+    "avgPaceSecPerKm": 548,
+    "avgHeartRate": 145,
+    "calories": 187
+  }
+]
