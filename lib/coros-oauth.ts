@@ -120,7 +120,8 @@ export async function buildAuthorizationUrl(params: {
   url.searchParams.set("code_challenge", params.codeChallenge);
   url.searchParams.set("code_challenge_method", "S256");
   // Adjust if COROS documents a narrower/wider scope list.
-  url.searchParams.set("scope", "offline_access read:activities read:health");
+  // url.searchParams.set("scope", "offline_access read:activities read:health");
+  url.searchParams.set("scope", "openid mcp.tools offline_access");
   return url.toString();
 }
 
