@@ -18,7 +18,8 @@ export async function GET() {
       GITHUB_OWNER: !!process.env.GITHUB_OWNER,
       GITHUB_REPO: !!process.env.GITHUB_REPO,
       CRON_SECRET: !!process.env.CRON_SECRET,
-      KV: !!process.env.KV_REST_API_URL,
+      DASHBOARD_PASSWORD: !!process.env.DASHBOARD_PASSWORD,
+      KV: !!(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL),
     },
   });
 }

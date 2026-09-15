@@ -43,7 +43,9 @@ Salin dari `.env.example` ke **Settings → Environment Variables**:
 | `GITHUB_OWNER` | `RifqiFachruradzi` |
 | `GITHUB_REPO` | nama repo ini |
 | `GITHUB_BRANCH` | `main` |
-| `CRON_SECRET` | string acak bebas — Vercel otomatis mengirim ini sebagai header saat memanggil cron |
+| `CRON_SECRET` | **wajib** — string acak bebas. Vercel otomatis mengirim ini sebagai header saat memanggil cron. Tanpa ini, `/api/cron/sync` menolak semua request di production. |
+| `DASHBOARD_PASSWORD` | disarankan — password untuk membuka dashboard (browser menampilkan prompt login, username bebas). Kosongkan kalau dashboard boleh publik. |
+| `WEEKLY_TARGET_KM` | opsional — target jarak mingguan dalam km (default `20`) |
 
 Redeploy setelah menambahkan env vars.
 
@@ -72,6 +74,26 @@ curl https://<domain-vercel-kamu>/api/cron/sync \
 > [Vercel Pro](https://vercel.com/docs/plans/pro-plan) (mendukung interval
 > per-menit). Ubah `schedule` di `vercel.json` sesuai kebutuhan setelah
 > upgrade.
+
+## Pelatih AI (rekomendasi & program latihan)
+
+Routine Claude Code terjadwal membaca `/data` setiap malam (23:30 WIB) dan
+menulis `data/recommendation.json`. Routine ini memakai kuota langganan
+Claude, jadi tidak perlu API key. Isi file itu: status kesiapan, latihan
+untuk besok, dan 2–3 tawaran program (misalnya "6K Goals Routine" atau
+"10K Routine"). Prompt routine dan skemanya ada di
+[`docs/coach-routine.md`](docs/coach-routine.md).
+
+- Klik **Terima program** di dashboard untuk menyimpan program ke Upstash
+  Redis. Hari penerimaan dihitung sebagai hari ke-1.
+- Progres dihitung otomatis dari `runs.json`. Sesi dianggap selesai kalau
+  lari di tanggal itu mencapai ≥ 90% jarak rencana.
+- Selama program aktif, kartu target mingguan memakai jarak rencana minggu
+  program itu, bukan `WEEKLY_TARGET_KM`.
+- Cron sync menyalin program aktif ke `data/active-program.json`, supaya
+  routine bisa menyesuaikan rekomendasi "latihan besok".
+- File yang ditulis AI selalu divalidasi (`lib/coach.ts`). Kalau formatnya
+  rusak, dashboard menampilkan pesan error dan tidak memakai isinya.
 
 ## Catatan penting soal integrasi COROS
 

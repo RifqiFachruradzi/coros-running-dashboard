@@ -10,8 +10,32 @@ import type {
   LoadSnapshot,
   BodySnapshot,
 } from "./types";
+import { parseRecommendation, type Recommendation } from "./coach";
 
 const DATA_DIR = path.join(process.cwd(), "data");
+
+export interface RecommendationFile {
+  recommendation: Recommendation | null;
+  /** Validation errors when the AI-written file is malformed */
+  errors: string[];
+}
+
+export async function readRecommendation(): Promise<RecommendationFile> {
+  let raw: string;
+  try {
+    raw = await readFile(path.join(DATA_DIR, "recommendation.json"), "utf-8");
+  } catch {
+    return { recommendation: null, errors: [] }; // routine hasn't run yet
+  }
+  try {
+    const parsed = parseRecommendation(JSON.parse(raw));
+    return parsed.ok
+      ? { recommendation: parsed.value, errors: [] }
+      : { recommendation: null, errors: parsed.errors };
+  } catch {
+    return { recommendation: null, errors: ["recommendation.json bukan JSON yang valid"] };
+  }
+}
 
 async function readJson<T>(filename: string, fallback: T): Promise<T> {
   try {

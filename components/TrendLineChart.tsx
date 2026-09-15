@@ -9,10 +9,19 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-import { formatPace } from "@/lib/aggregate";
+import { formatDay, formatPace, formatShortDay } from "@/lib/aggregate";
+import {
+  axisTick,
+  dotStyle,
+  lineCursor,
+  tooltipContentStyle,
+  tooltipItemStyle,
+  tooltipLabelStyle,
+} from "@/components/chart-theme";
+import { ChartEmpty } from "@/components/ChartEmpty";
 
 export interface TrendPoint {
-  x: string;
+  x: string; // yyyy-MM-dd
   y: number | null;
 }
 
@@ -23,6 +32,13 @@ export type TrendFormat = "pace" | "integer";
 const FORMATTERS: Record<TrendFormat, (v: number) => string> = {
   pace: (v) => formatPace(v),
   integer: (v) => String(Math.round(v)),
+};
+
+// Pad the axis around the data (rounded to clean steps) instead of starting at
+// zero, which flattened every trend into a straight line.
+const DOMAINS: Record<TrendFormat, [(min: number) => number, (max: number) => number]> = {
+  pace: [(min) => Math.floor((min - 15) / 30) * 30, (max) => Math.ceil((max + 15) / 30) * 30],
+  integer: [(min) => Math.max(0, Math.floor((min - 3) / 5) * 5), (max) => Math.ceil((max + 3) / 5) * 5],
 };
 
 export function TrendLineChart({
@@ -39,60 +55,49 @@ export function TrendLineChart({
   const formatY = FORMATTERS[format];
   const clean = data.filter((d) => d.y !== null);
 
-  if (clean.length === 0) {
-    return (
-      <div
-        className="h-40 flex items-center justify-center text-xs"
-        style={{ color: "var(--text-muted)" }}
-      >
-        Belum ada data yang cukup.
-      </div>
-    );
-  }
+  if (clean.length === 0) return <ChartEmpty text="Belum ada data yang cukup." />;
 
   return (
-    <div className="h-40">
+    <div className="h-48">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={clean} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-          <CartesianGrid
-            stroke="var(--gridline)"
-            strokeDasharray="0"
-            vertical={false}
-          />
+        <LineChart data={clean} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+          <CartesianGrid stroke="var(--gridline)" vertical={false} />
           <XAxis
             dataKey="x"
-            tick={{ fontSize: 11, fill: "var(--text-muted)" }}
+            tickFormatter={formatShortDay}
+            tick={axisTick}
             axisLine={{ stroke: "var(--baseline)" }}
             tickLine={false}
-            minTickGap={24}
+            minTickGap={28}
           />
           <YAxis
             tickFormatter={formatY}
-            tick={{ fontSize: 11, fill: "var(--text-muted)" }}
+            tick={axisTick}
             axisLine={false}
             tickLine={false}
             width={44}
+            domain={DOMAINS[format]}
+            // A lower pace is faster, so flip the axis: up always means better.
+            reversed={format === "pace"}
+            tickCount={format === "pace" ? 5 : 4}
+            allowDecimals={false}
           />
           <Tooltip
-            formatter={(value: number) => [
-              `${formatY(value)}${unit ? " " + unit : ""}`,
-              undefined,
-            ]}
-            contentStyle={{
-              background: "var(--surface-1)",
-              border: "1px solid var(--border-hairline)",
-              borderRadius: 8,
-              fontSize: 12,
-              color: "var(--text-primary)",
-            }}
+            cursor={lineCursor}
+            contentStyle={tooltipContentStyle}
+            labelStyle={tooltipLabelStyle}
+            itemStyle={tooltipItemStyle}
+            separator=""
+            formatter={(value: number) => [`${formatY(value)}${unit ? ` ${unit}` : ""}`, ""]}
+            labelFormatter={(label) => formatDay(String(label))}
           />
           <Line
             type="monotone"
             dataKey="y"
             stroke={color}
             strokeWidth={2}
-            dot={{ r: 3, fill: color, strokeWidth: 0 }}
-            activeDot={{ r: 5 }}
+            dot={dotStyle(color)}
+            activeDot={dotStyle(color, 6)}
             isAnimationActive={false}
           />
         </LineChart>

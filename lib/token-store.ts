@@ -1,5 +1,6 @@
 // Persists OAuth tokens (and the short-lived PKCE state during the login
-// handshake) across serverless invocations using Vercel KV.
+// handshake) across serverless invocations using Vercel KV. Also keeps the
+// result of the last sync so the dashboard can show whether syncing works.
 //
 // Why KV and not an env var: COROS's OAuth 2.0 authorization server may
 // rotate refresh tokens on each use (standard practice for public/DCR
@@ -13,12 +14,16 @@
 // integration; same underlying Upstash Redis, same env var names.)
 
 import { Redis } from "@upstash/redis";
+import type { SyncResult } from "./types";
+import type { ActiveProgram } from "./coach";
 
 const kv = Redis.fromEnv();
 
 const TOKEN_KEY = "coros:oauth:tokens";
 const CLIENT_KEY = "coros:oauth:client";
 const PENDING_PREFIX = "coros:oauth:pending:"; // + state
+const SYNC_STATUS_KEY = "coros:sync:last";
+const ACTIVE_PROGRAM_KEY = "coach:program:active";
 
 export interface CorosTokenSet {
   accessToken: string;
@@ -77,4 +82,52 @@ export async function consumePendingAuth(
   const value = await kv.get<PendingAuth>(key);
   if (value) await kv.del(key);
   return value ?? null;
+}
+
+export async function saveSyncStatus(result: SyncResult): Promise<void> {
+  await kv.set(SYNC_STATUS_KEY, result);
+}
+
+export async function loadSyncStatus(): Promise<SyncResult | null> {
+  return (await kv.get<SyncResult>(SYNC_STATUS_KEY)) ?? null;
+}
+
+export async function saveActiveProgram(active: ActiveProgram): Promise<void> {
+  await kv.set(ACTIVE_PROGRAM_KEY, active);
+}
+
+export async function loadActiveProgram(): Promise<ActiveProgram | null> {
+  return (await kv.get<ActiveProgram>(ACTIVE_PROGRAM_KEY)) ?? null;
+}
+
+export async function clearActiveProgram(): Promise<void> {
+  await kv.del(ACTIVE_PROGRAM_KEY);
+}
+
+export function isStorageConfigured(): boolean {
+  return !!(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL);
+}
+
+export interface DashboardStatus {
+  /** "not-configured": no Redis env vars (e.g. local dev without .env.local) */
+  storage: "ok" | "not-configured" | "unreachable";
+  corosConnected: boolean;
+  lastSync: SyncResult | null;
+  activeProgram: ActiveProgram | null;
+}
+
+export async function loadDashboardStatus(): Promise<DashboardStatus> {
+  const empty = { corosConnected: false, lastSync: null, activeProgram: null };
+  if (!isStorageConfigured()) return { storage: "not-configured", ...empty };
+  try {
+    const [tokens, lastSync, activeProgram] = await Promise.all([
+      loadTokens(),
+      loadSyncStatus(),
+      loadActiveProgram(),
+    ]);
+    return { storage: "ok", corosConnected: !!tokens, lastSync, activeProgram };
+  } catch (err) {
+    console.error("Failed to load dashboard status:", err);
+    return { storage: "unreachable", ...empty };
+  }
 }

@@ -9,52 +9,56 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import {
+  axisTick,
+  barCursor,
+  tooltipContentStyle,
+  tooltipItemStyle,
+  tooltipLabelStyle,
+} from "@/components/chart-theme";
+import { ChartEmpty } from "@/components/ChartEmpty";
 
 export function DistanceBarChart({
   data,
 }: {
   data: { week: string; km: number }[];
 }) {
-  if (data.length === 0) {
-    return (
-      <div
-        className="h-40 flex items-center justify-center text-xs"
-        style={{ color: "var(--text-muted)" }}
-      >
-        Belum ada data jarak mingguan.
-      </div>
-    );
-  }
+  if (data.length === 0) return <ChartEmpty text="Belum ada data jarak mingguan." />;
 
   return (
-    <div className="h-40">
+    <div className="h-48">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+        <BarChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
           <CartesianGrid stroke="var(--gridline)" vertical={false} />
           <XAxis
             dataKey="week"
-            tick={{ fontSize: 11, fill: "var(--text-muted)" }}
+            tick={axisTick}
             axisLine={{ stroke: "var(--baseline)" }}
             tickLine={false}
           />
           <YAxis
-            tick={{ fontSize: 11, fill: "var(--text-muted)" }}
+            tick={axisTick}
             axisLine={false}
             tickLine={false}
             width={32}
-            tickFormatter={(v) => `${v}`}
+            allowDecimals={false}
           />
           <Tooltip
-            formatter={(value: number) => [`${value.toFixed(1)} km`, "Jarak"]}
-            contentStyle={{
-              background: "var(--surface-1)",
-              border: "1px solid var(--border-hairline)",
-              borderRadius: 8,
-              fontSize: 12,
-              color: "var(--text-primary)",
-            }}
+            cursor={barCursor}
+            contentStyle={tooltipContentStyle}
+            labelStyle={tooltipLabelStyle}
+            itemStyle={tooltipItemStyle}
+            separator=""
+            formatter={(value: number) => [`${value.toFixed(1)} km`, ""]}
+            labelFormatter={(label) => `Minggu mulai ${label}`}
           />
-          <Bar dataKey="km" fill="var(--series-2)" radius={[4, 4, 0, 0]} maxBarSize={28} />
+          <Bar
+            dataKey="km"
+            fill="var(--series-2)"
+            radius={[4, 4, 0, 0]}
+            maxBarSize={24}
+            isAnimationActive={false}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>

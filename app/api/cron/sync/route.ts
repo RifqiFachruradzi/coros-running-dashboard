@@ -23,6 +23,7 @@ import {
   mergeBodySnapshots,
 } from "@/lib/data-store";
 import { commitDataFiles } from "@/lib/github";
+import { loadActiveProgram, saveSyncStatus } from "@/lib/token-store";
 import type { SyncResult } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -32,9 +33,21 @@ const RUNNING_SPORT_CODES = [100, 101, 102, 103, 104];
 
 function isAuthorized(req: NextRequest): boolean {
   const secret = process.env.CRON_SECRET;
-  if (!secret) return true; // no secret configured — allow (dev/local only)
+  // Without a secret anyone could trigger syncs (spending COROS quota and
+  // pushing commits), so an unset secret is only tolerated outside production.
+  if (!secret) return process.env.NODE_ENV !== "production";
   const header = req.headers.get("authorization");
   return header === `Bearer ${secret}`;
+}
+
+// The dashboard's status badge reads this; failing to save it must not fail
+// the sync itself.
+async function recordSyncStatus(result: SyncResult) {
+  try {
+    await saveSyncStatus(result);
+  } catch (err) {
+    console.error("Failed to save sync status:", err);
+  }
 }
 
 export async function GET(req: NextRequest) {
@@ -140,10 +153,21 @@ export async function GET(req: NextRequest) {
       result.committed = committed;
     }
 
+    // The coaching routine can't reach Redis, so it reads the accepted program
+    // from the repo. commitDataFiles skips the commit when nothing changed.
+    const activeProgram = await loadActiveProgram();
+    const snapshotCommitted = await commitDataFiles(
+      [{ path: "data/active-program.json", content: JSON.stringify(activeProgram, null, 2) }],
+      `coach: snapshot program aktif (${today})`
+    );
+    result.committed = result.committed || snapshotCommitted;
+
+    await recordSyncStatus(result);
     return NextResponse.json(result);
   } catch (err: any) {
     console.error("Cron sync failed:", err);
     result.error = err.message;
+    await recordSyncStatus(result);
     return NextResponse.json(result, { status: 500 });
   }
 }
