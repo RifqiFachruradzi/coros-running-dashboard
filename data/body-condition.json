@@ -1,1 +1,219 @@
-[]
+[
+  {
+    "date": "2026-09-10",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 29
+  },
+  {
+    "date": "2026-09-11",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 35
+  },
+  {
+    "date": "2026-09-13",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 69
+  },
+  {
+    "date": "2026-09-14",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 32
+  },
+  {
+    "date": "2026-09-15",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 40
+  },
+  {
+    "date": "2026-09-16",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 33
+  },
+  {
+    "date": "2026-09-17",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 30
+  },
+  {
+    "date": "2026-09-18",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 36
+  },
+  {
+    "date": "2026-09-19",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 50
+  },
+  {
+    "date": "2026-09-20",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 44
+  },
+  {
+    "date": "2026-09-21",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 36
+  },
+  {
+    "date": "2026-09-22",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 34
+  },
+  {
+    "date": "2026-09-23",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 41
+  },
+  {
+    "date": "2026-09-24",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 38
+  },
+  {
+    "date": "2026-09-25",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 35
+  },
+  {
+    "date": "2026-09-26",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 37
+  },
+  {
+    "date": "2026-09-27",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 55
+  },
+  {
+    "date": "2026-09-28",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 33
+  },
+  {
+    "date": "2026-09-29",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 28
+  },
+  {
+    "date": "2026-09-30",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 27
+  },
+  {
+    "date": "2026-10-01",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 34
+  },
+  {
+    "date": "2026-10-02",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 29
+  },
+  {
+    "date": "2026-10-03",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 72
+  },
+  {
+    "date": "2026-10-04",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 30
+  },
+  {
+    "date": "2026-10-05",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 29
+  },
+  {
+    "date": "2026-10-06",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 32
+  },
+  {
+    "date": "2026-10-07",
+    "restingHeartRate": 54,
+    "sleepScore": 96,
+    "sleepDurationMinutes": 441,
+    "stressLevel": 36
+  },
+  {
+    "date": "2026-10-08",
+    "restingHeartRate": 64,
+    "sleepScore": 83,
+    "sleepDurationMinutes": 465,
+    "stressLevel": 35
+  },
+  {
+    "date": "2026-10-09",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 48
+  },
+  {
+    "date": "2026-10-11",
+    "restingHeartRate": null,
+    "sleepScore": null,
+    "sleepDurationMinutes": null,
+    "stressLevel": 54
+  },
+  {
+    "date": "2026-10-12",
+    "restingHeartRate": 58,
+    "sleepScore": 93,
+    "sleepDurationMinutes": 439,
+    "stressLevel": 30
+  }
+]
