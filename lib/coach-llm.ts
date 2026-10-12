@@ -140,7 +140,16 @@ async function chat(messages: ChatMessage[]): Promise<string> {
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!res.ok) {
-    throw new Error(`9Router ${res.status}: ${(await res.text()).slice(0, 500)}`);
+    // An empty 401 body says little on its own; the headers show whether
+    // 9Router or a proxy in front of it answered.
+    const headers = ["server", "www-authenticate", "content-type", "x-request-id"]
+      .map((h) => (res.headers.get(h) ? `${h}=${res.headers.get(h)}` : null))
+      .filter(Boolean)
+      .join(", ");
+    throw new Error(
+      `9Router ${res.status} (model "${model}", key ${apiKey.slice(0, 6)}…${apiKey.slice(-4)}, ` +
+        `${headers || "tanpa header"}): ${(await res.text()).slice(0, 500) || "body kosong"}`
+    );
   }
   const body = await res.json();
   const content = body?.choices?.[0]?.message?.content;
