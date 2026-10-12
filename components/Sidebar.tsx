@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { logout } from "@/app/login/actions";
 import { Icon, type IconName } from "@/components/icons";
+import { BoltS } from "@/components/Logo";
 
 const ITEMS: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Ringkasan", icon: "home" },
@@ -21,13 +22,14 @@ export function Sidebar({ active, showLogout }: { active: string; showLogout: bo
       className="flex w-full shrink-0 items-center gap-2 rounded-3xl p-2 lg:sticky lg:top-6 lg:w-[72px] lg:flex-col lg:self-start lg:py-5"
       style={{ background: "var(--pink)", color: "var(--on-color)" }}
     >
-      <span
-        className="mx-1 hidden h-11 w-11 shrink-0 items-center justify-center rounded-full lg:mb-4 lg:flex"
-        style={{ border: "2px solid rgba(10, 10, 12, 0.4)" }}
-        aria-hidden
+      <Link
+        href="/"
+        aria-label="STRIDE+ beranda"
+        className="mx-1 hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl lg:mb-4 lg:flex"
+        style={{ background: "var(--on-color)" }}
       >
-        <Icon name="logo" />
-      </span>
+        <BoltS size={30} id="sidebar" />
+      </Link>
       <div className="flex flex-1 items-center gap-1 overflow-x-auto lg:flex-none lg:flex-col">
         {ITEMS.map((item) => {
           const current = item.href === active;

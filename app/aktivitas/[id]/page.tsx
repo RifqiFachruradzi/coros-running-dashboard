@@ -14,7 +14,7 @@ import { formatNumber, formatSignedPace } from "@/components/format";
 
 export const revalidate = 0;
 
-export const metadata: Metadata = { title: "Analisis lari — Dashboard Lari" };
+export const metadata: Metadata = { title: "Analisis lari — STRIDE+" };
 
 const PR_TEXT: Record<PrKind, string> = {
   longest: "Rekor lari terjauh",

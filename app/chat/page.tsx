@@ -5,7 +5,7 @@ import { programProgress } from "@/lib/coach";
 import { CoachChat } from "@/components/CoachChat";
 import { AppShell } from "@/components/AppShell";
 
-export const metadata: Metadata = { title: "Chat Coach — Dashboard Lari" };
+export const metadata: Metadata = { title: "Chat Coach — STRIDE+" };
 
 export const revalidate = 0;
 

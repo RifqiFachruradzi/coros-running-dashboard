@@ -10,7 +10,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Dashboard Lari — COROS",
+  title: "STRIDE+ — Running dashboard",
   description: "Progress latihan lari, ditarik otomatis dari COROS.",
 };
 

@@ -12,7 +12,7 @@ import { ActivityTable } from "@/components/ActivityTable";
 import { Icon } from "@/components/icons";
 import { formatHours } from "@/components/format";
 
-export const metadata: Metadata = { title: "Riwayat latihan — Dashboard Lari" };
+export const metadata: Metadata = { title: "Riwayat latihan — STRIDE+" };
 export const revalidate = 0;
 
 const WEEKDAYS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];

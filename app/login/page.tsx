@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { isLoginConfigured, safeNextPath } from "@/lib/auth";
-import { Icon } from "@/components/icons";
+import { BoltS } from "@/components/Logo";
 import { Motion } from "@/components/Motion";
 import { LoginForm } from "./LoginForm";
 
-export const metadata: Metadata = { title: "Masuk — Dashboard Lari" };
+export const metadata: Metadata = { title: "Masuk — STRIDE+" };
 
 export default async function LoginPage({
   searchParams,
@@ -22,13 +22,10 @@ export default async function LoginPage({
           style={{ background: "var(--blue)", color: "var(--on-color)" }}
         >
           <div className="flex items-center gap-3">
-            <span
-              className="flex h-11 w-11 items-center justify-center rounded-full"
-              style={{ border: "2px solid rgba(10, 10, 12, 0.4)" }}
-            >
-              <Icon name="logo" />
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: "var(--on-color)" }}>
+              <BoltS size={30} id="login" />
             </span>
-            <span className="text-base font-semibold">Dashboard Lari</span>
+            <span className="text-2xl font-bold italic tracking-tight">STRIDE+</span>
           </div>
           <div>
             <p className="text-3xl font-bold leading-tight sm:text-4xl">

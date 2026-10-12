@@ -28,7 +28,7 @@ import { SectionHeader } from "@/components/SectionHeader";
 import { TrendLineChart } from "@/components/TrendLineChart";
 import { LoadChart } from "@/components/LoadChart";
 import { ActivityTable } from "@/components/ActivityTable";
-import { SyncStatusBadge } from "@/components/SyncStatusBadge";
+import { DashboardHeader } from "@/components/DashboardHeader";
 import { VolumeHero } from "@/components/VolumeHero";
 import { TomorrowCard, LastRunCard } from "@/components/HighlightCards";
 import { GoalCard } from "@/components/GoalCard";
@@ -116,21 +116,14 @@ export default async function DashboardPage() {
 
   return (
     <AppShell active="/">
-
         <div id="ringkasan" className="flex min-w-0 flex-[999_1_600px] scroll-mt-6 flex-col gap-8 lg:py-1.5">
-          <header className="flex flex-wrap items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="eyebrow">COROS · {formatDay(today)}</p>
-              <h1 className="text-2xl font-bold">Dashboard Lari</h1>
-              <p className="mt-0.5 text-sm" style={{ color: "var(--text-secondary)" }}>
-                {lastRun
-                  ? `Lari terakhir ${formatDay(lastRun.date)} · ${lastRun.distanceKm.toFixed(2)} km`
-                  : "Belum ada lari tercatat"}{" "}
-                · {sortedRuns.length} aktivitas
-              </p>
-            </div>
-            <SyncStatusBadge status={status} />
-          </header>
+          <DashboardHeader
+            today={today}
+            lastRun={lastRun}
+            totalRuns={sortedRuns.length}
+            weekKm={weekProgress(sortedRuns, 0, today).km}
+            status={status}
+          />
 
           {/* Hero */}
           <div className="flex flex-wrap gap-5">

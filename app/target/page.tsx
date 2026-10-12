@@ -16,7 +16,7 @@ import { Icon } from "@/components/icons";
 import { DeleteGoalButton, GoalForm } from "@/components/GoalForm";
 import { formatNumber } from "@/components/format";
 
-export const metadata: Metadata = { title: "Target — Dashboard Lari" };
+export const metadata: Metadata = { title: "Target — STRIDE+" };
 export const revalidate = 0;
 
 const STATUS: Record<GoalStatus, { period: string; race: string; tone: string; color: string }> = {

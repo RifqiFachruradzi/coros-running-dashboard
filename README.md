@@ -1,4 +1,4 @@
-# Dashboard Lari — COROS
+# STRIDE+ — dashboard lari COROS
 
 Dashboard progress lari personal: menarik data lari, fitness assessment,
 training load, dan kondisi tubuh (resting HR, sleep, stress) langsung dari

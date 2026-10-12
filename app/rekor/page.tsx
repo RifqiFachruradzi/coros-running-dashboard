@@ -11,7 +11,7 @@ import { Icon, type IconName } from "@/components/icons";
 import type { Tone } from "@/components/GoalCard";
 import { formatHours } from "@/components/format";
 
-export const metadata: Metadata = { title: "Performa terbaik — Dashboard Lari" };
+export const metadata: Metadata = { title: "Performa terbaik — STRIDE+" };
 export const revalidate = 0;
 
 const PR_LABEL: Record<PrKind, { text: string; tone: Exclude<Tone, "neutral"> }> = {

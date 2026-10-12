@@ -3,12 +3,6 @@
 import type { SVGProps } from "react";
 
 const PATHS = {
-  logo: (
-    <>
-      <path d="M3 17l5-6 4 3 6-8" />
-      <path d="M14 6h4v4" />
-    </>
-  ),
   home: <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" />,
   chart: (
     <>

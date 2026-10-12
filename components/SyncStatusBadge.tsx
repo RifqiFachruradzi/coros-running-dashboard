@@ -62,7 +62,7 @@ export function SyncStatusBadge({ status }: { status: DashboardStatus }) {
 
   return (
     <div className="flex min-w-0 flex-col items-start gap-1 sm:items-end">
-      <div className="pill min-h-[40px] px-4 font-medium" style={{ background: "var(--surface-2)", color: "var(--text-secondary)" }}>
+      <div className="pill min-h-[40px] px-4 font-medium" style={{ background: "var(--surface-1)", color: "var(--text-secondary)" }}>
         <span aria-hidden className="dot" style={{ background: TONE_COLOR[tone] }} />
         <span>{text}</span>
         {reconnect && (
