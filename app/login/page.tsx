@@ -21,18 +21,14 @@ export default async function LoginPage({
           className="flex flex-col gap-7 rounded-[26px] p-7 sm:p-9 md:min-h-[520px] md:flex-1"
           style={{ background: "var(--blue)", color: "var(--on-color)" }}
         >
-          <div className="flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: "var(--on-color)" }}>
-              <BoltS size={30} id="login" />
-            </span>
-            <span className="text-2xl font-bold italic tracking-tight">STRIDE+</span>
-          </div>
+          <span className="flex h-16 w-16 items-center justify-center rounded-[20px]" style={{ background: "var(--on-color)" }}>
+            <BoltS size={42} id="login" />
+          </span>
           <div>
-            <p className="text-3xl font-bold leading-tight sm:text-4xl">
-              Lari, catat,
-              <br />
-              naik level.
+            <p className="text-5xl font-bold italic leading-none tracking-tight sm:text-6xl">
+              STRIDE<span style={{ color: "var(--yellow)", WebkitTextStroke: "1.5px var(--on-color)" }}>+</span>
             </p>
+            <p className="mt-3 text-xl font-semibold sm:text-2xl">Lari, catat, naik level.</p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed">
               Data COROS-mu disinkronkan setiap malam, dengan pelatih AI yang membaca setiap kilometer.
             </p>
@@ -46,9 +42,11 @@ export default async function LoginPage({
 
         <div className="flex items-center justify-center px-2 py-6 sm:p-6 md:flex-1">
           <div data-animate="rise" className="w-full max-w-sm">
-            <h1 className="text-2xl font-bold">Masuk</h1>
+            <h1 className="text-2xl font-bold">
+              Masuk ke STRIDE<span style={{ color: "var(--yellow)" }}>+</span>
+            </h1>
             <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
-              Dashboard ini berisi data latihan dan kesehatan pribadi.
+              STRIDE+ berisi data latihan dan kesehatan pribadimu.
             </p>
             {isLoginConfigured() ? (
               <LoginForm next={safeNextPath(next)} />

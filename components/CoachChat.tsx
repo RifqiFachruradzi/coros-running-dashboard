@@ -152,7 +152,7 @@ export function CoachChat({ initialQuestion = "" }: { initialQuestion?: string }
 
   return (
     <div
-      className="flex h-[calc(100dvh-9rem)] min-h-[420px] flex-col overflow-hidden rounded-3xl"
+      className="flex h-[calc(100dvh-12rem)] min-h-[420px] flex-col overflow-hidden rounded-3xl lg:h-[calc(100dvh-9rem)]"
       style={{ border: "1px solid var(--border-hairline)" }}
     >
       <div

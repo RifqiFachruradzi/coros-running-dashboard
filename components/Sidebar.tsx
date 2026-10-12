@@ -12,15 +12,16 @@ const ITEMS: { href: string; label: string; icon: IconName }[] = [
 ];
 
 /**
- * The pink pill menu: a column on wide screens, a scrollable row above the
- * content on phones. `active` is the href of the current section.
+ * The pink pill menu: a sticky column on wide screens, a bar floating at the
+ * bottom of the screen on phones (AppShell leaves room for it). `active` is
+ * the href of the current section.
  */
 export function Sidebar({ active, showLogout }: { active: string; showLogout: boolean }) {
   return (
     <nav
       aria-label="Menu utama"
-      className="flex w-full shrink-0 items-center gap-2 rounded-3xl p-2 lg:sticky lg:top-6 lg:w-[72px] lg:flex-col lg:self-start lg:py-5"
-      style={{ background: "var(--pink)", color: "var(--on-color)" }}
+      className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-50 flex items-center gap-2 rounded-3xl p-2 lg:sticky lg:inset-x-auto lg:bottom-auto lg:top-6 lg:z-auto lg:w-[72px] lg:shrink-0 lg:flex-col lg:self-start lg:py-5"
+      style={{ background: "var(--pink)", color: "var(--on-color)", boxShadow: "0 10px 30px rgba(0, 0, 0, 0.55)" }}
     >
       <Link
         href="/"
@@ -30,7 +31,7 @@ export function Sidebar({ active, showLogout }: { active: string; showLogout: bo
       >
         <BoltS size={30} id="sidebar" />
       </Link>
-      <div className="flex flex-1 items-center gap-1 overflow-x-auto lg:flex-none lg:flex-col">
+      <div className="flex flex-1 items-center justify-between gap-1 overflow-x-auto lg:flex-none lg:flex-col lg:justify-start">
         {ITEMS.map((item) => {
           const current = item.href === active;
           return (

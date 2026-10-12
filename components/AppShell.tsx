@@ -12,8 +12,9 @@ export function AppShell({
   maxWidth?: number;
   children: React.ReactNode;
 }) {
+  // Bottom padding on phones keeps content clear of the floating menu bar.
   return (
-    <main className="min-h-dvh px-3 py-4 sm:px-6 sm:py-8 lg:py-10">
+    <main className="min-h-dvh px-3 pb-28 pt-4 sm:px-6 sm:pt-8 lg:py-10">
       <div
         className="app-shell mx-auto flex flex-col gap-6 p-3 sm:p-5 lg:flex-row lg:flex-wrap lg:items-start"
         style={{ maxWidth }}
