@@ -1,10 +1,13 @@
-// Thin wrapper that opens an authenticated MCP session against
-// https://mcp.coros.com/mcp and calls its tools, mirroring the tool names
-// COROS exposes for running data (same tool set used by the AI-assistant
-// integration: querySportRecords, queryFitnessAssessmentOverview,
-// queryTrainingLoadAssessment, queryRestingHeartRate, querySleepData,
-// queryStressLevel). Verify exact tool names once you can inspect a live
-// tools/list response — COROS may version or rename fields.
+// Thin wrapper that opens one authenticated MCP session against
+// https://mcp.coros.com/mcp and calls its tools (querySportRecords,
+// queryFitnessAssessmentOverview, queryTrainingLoadAssessment,
+// queryRestingHeartRate, querySleepOverview, queryStressLevel).
+//
+// One session per sync on purpose: each session used to check the token on
+// its own, so an expired token was refreshed several times in parallel with
+// the same refresh token. When the server rotates refresh tokens, all but
+// one of those refreshes are rejected and the stored token can end up
+// revoked, which disconnects COROS until someone re-authorizes.
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
@@ -44,8 +47,12 @@ async function getValidAccessToken(): Promise<string> {
   return newTokens.accessToken;
 }
 
-async function withMcpClient<T>(
-  fn: (client: Client) => Promise<T>
+export interface CorosSession {
+  call<T = unknown>(name: string, args: Record<string, unknown>): Promise<T>;
+}
+
+export async function withCorosSession<T>(
+  fn: (session: CorosSession) => Promise<T>
 ): Promise<T> {
   const accessToken = await getValidAccessToken();
 
@@ -57,31 +64,31 @@ async function withMcpClient<T>(
 
   const client = new Client({ name: "coros-running-dashboard", version: "0.1.0" });
   await client.connect(transport);
+
+  const session: CorosSession = {
+    async call<R>(name: string, args: Record<string, unknown>): Promise<R> {
+      const result = await client.callTool({ name, arguments: args });
+      // MCP tool results come back as content blocks; COROS's tools return a
+      // single human-readable text block.
+      const content = (result as any).content;
+      const firstText = Array.isArray(content)
+        ? content.find((c: any) => c.type === "text")?.text
+        : undefined;
+      if ((result as any).isError) {
+        throw new Error(`COROS tool ${name} gagal: ${firstText ?? "tanpa pesan"}`);
+      }
+      if (!firstText) return result as R;
+      try {
+        return JSON.parse(firstText) as R;
+      } catch {
+        return firstText as R;
+      }
+    },
+  };
+
   try {
-    return await fn(client);
+    return await fn(session);
   } finally {
     await client.close();
   }
-}
-
-export async function callCorosTool<T = unknown>(
-  name: string,
-  args: Record<string, unknown>
-): Promise<T> {
-  return withMcpClient(async (client) => {
-    const result = await client.callTool({ name, arguments: args });
-    // MCP tool results come back as content blocks; COROS's tools return a
-    // single text block containing JSON (mirroring the human-readable +
-    // structured payload pattern used elsewhere in their API).
-    const content = (result as any).content;
-    const firstText = Array.isArray(content)
-      ? content.find((c: any) => c.type === "text")?.text
-      : undefined;
-    if (!firstText) return result as T;
-    try {
-      return JSON.parse(firstText) as T;
-    } catch {
-      return firstText as T;
-    }
-  });
 }

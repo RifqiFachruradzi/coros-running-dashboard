@@ -16,14 +16,8 @@
 //
 // The parsers below are written against that exact observed format for
 // querySportRecords, queryFitnessAssessmentOverview and
-// queryTrainingLoadAssessment. queryRestingHeartRate / querySleepData /
-// queryStressLevel were NOT exercised while building this project — their
-// parsers are best-effort and log the raw text on failure instead of
-// throwing, so one unexpected format doesn't break the whole sync. Check
-// the Vercel function logs after the first live cron run and adjust the
-// regexes here if COROS's public MCP server formats them differently (or
-// returns structured JSON instead — coros-mcp-client.ts already tries
-// JSON.parse first and only falls back to raw text).
+// queryTrainingLoadAssessment, and parseBodyHistory against the observed
+// output of queryRestingHeartRate, querySleepOverview and queryStressLevel.
 
 import type { RunActivity, FitnessSnapshot, LoadSnapshot, BodySnapshot } from "./types";
 
@@ -44,7 +38,8 @@ export function parseSportRecords(raw: string): RunActivity[] {
     const locationMatch = entry.match(/Location:\s*(.+)/);
     const timestampMatch = entry.match(/startTimestamp=(\d+)/);
     const durationMatch = entry.match(/Duration:\s*([\d:]+)/);
-    const distanceMatch = entry.match(/Distance:\s*([\d.]+)\s*km/);
+    // Runs under 1 km are listed in meters ("Distance: 432 m").
+    const distanceMatch = entry.match(/Distance:\s*([\d.]+)\s*(km|m)\b/);
     const paceMatch = entry.match(/Average Pace:\s*([\d:]+)\s*\/km/);
     const hrMatch = entry.match(/Avg HR:\s*(\d+)\s*bpm/);
     const caloriesMatch = entry.match(/Calories:\s*(\d+)\s*kcal/);
@@ -60,7 +55,9 @@ export function parseSportRecords(raw: string): RunActivity[] {
       startTimestamp: timestampMatch ? Number(timestampMatch[1]) : 0,
       location: locationMatch ? locationMatch[1].trim() : null,
       durationSeconds: durationMatch ? toSeconds(durationMatch[1]) ?? 0 : 0,
-      distanceKm: distanceMatch ? Number(distanceMatch[1]) : 0,
+      distanceKm: distanceMatch
+        ? Number(distanceMatch[1]) / (distanceMatch[2] === "m" ? 1000 : 1)
+        : 0,
       avgPaceSecPerKm: paceMatch ? toSeconds(paceMatch[1]) : null,
       avgHeartRate: hrMatch ? Number(hrMatch[1]) : null,
       calories: caloriesMatch ? Number(caloriesMatch[1]) : null,
@@ -122,45 +119,56 @@ export function parseTrainingLoad(raw: string): LoadSnapshot[] {
 }
 
 /** Best-effort — not verified against live output. See module header. */
-export function parseBodyCondition(params: {
-  restingHrRaw: string;
-  sleepRaw: string;
-  stressRaw: string;
-  date: string;
-}): BodySnapshot {
-  const result: BodySnapshot = {
-    date: params.date,
-    restingHeartRate: null,
-    sleepScore: null,
-    sleepDurationMinutes: null,
-    stressLevel: null,
+// The three body-condition tools each return one entry per day (dates in the
+// user's COROS timezone), observed formats:
+//   queryRestingHeartRate  "2026-10-12: 58 bpm" / "2026-10-11: No data"
+//   queryStressLevel       "2026-10-12:\nAverage Stress: 15 (Relaxed)"
+//   querySleepOverview     "2026-10-12\nSleep Score: 93\n...Main Sleep (asleep): 7h 19min"
+// Pass null for a tool that failed; its fields stay null.
+export function parseBodyHistory(params: {
+  restingHrRaw: string | null;
+  sleepRaw: string | null;
+  stressRaw: string | null;
+}): BodySnapshot[] {
+  const byDate = new Map<string, BodySnapshot>();
+  const day = (date: string) => {
+    let snap = byDate.get(date);
+    if (!snap) {
+      snap = {
+        date,
+        restingHeartRate: null,
+        sleepScore: null,
+        sleepDurationMinutes: null,
+        stressLevel: null,
+      };
+      byDate.set(date, snap);
+    }
+    return snap;
   };
 
-  try {
-    const rhrMatch = params.restingHrRaw.match(/(\d+)\s*bpm/);
-    if (rhrMatch) result.restingHeartRate = Number(rhrMatch[1]);
-  } catch (e) {
-    console.error("parseBodyCondition: resting HR parse failed", e, params.restingHrRaw);
+  for (const m of (params.restingHrRaw ?? "").matchAll(/(\d{4}-\d{2}-\d{2}):\s*(\d+)\s*bpm/g)) {
+    day(m[1]).restingHeartRate = Number(m[2]);
   }
 
-  try {
-    const scoreMatch = params.sleepRaw.match(/Sleep Score:\s*(\d+)/i);
-    if (scoreMatch) result.sleepScore = Number(scoreMatch[1]);
-    const durationMatch = params.sleepRaw.match(/Duration:\s*([\d:]+)/i);
-    if (durationMatch) {
-      const secs = toSeconds(durationMatch[1]);
-      if (secs !== null) result.sleepDurationMinutes = Math.round(secs / 60);
+  for (const m of (params.stressRaw ?? "").matchAll(
+    /(\d{4}-\d{2}-\d{2}):\s*\n\s*Average Stress:\s*(\d+)/g
+  )) {
+    day(m[1]).stressLevel = Number(m[2]);
+  }
+
+  // Split on the date lines that start each night's block.
+  const sleepBlocks = (params.sleepRaw ?? "").split(/^(?=\d{4}-\d{2}-\d{2}\s*$)/m);
+  for (const block of sleepBlocks) {
+    const date = block.match(/^(\d{4}-\d{2}-\d{2})\s*$/m)?.[1];
+    if (!date) continue;
+    // A score of 0 means COROS has no sleep detail for that night yet.
+    const score = Number(block.match(/Sleep Score:\s*(\d+)/i)?.[1] ?? 0);
+    if (score > 0) day(date).sleepScore = score;
+    const duration = block.match(/Main Sleep \(asleep\):\s*(?:(\d+)h)?\s*(?:(\d+)\s*min)?/i);
+    if (duration && (duration[1] || duration[2])) {
+      day(date).sleepDurationMinutes = Number(duration[1] ?? 0) * 60 + Number(duration[2] ?? 0);
     }
-  } catch (e) {
-    console.error("parseBodyCondition: sleep parse failed", e, params.sleepRaw);
   }
 
-  try {
-    const stressMatch = params.stressRaw.match(/(\d+)/);
-    if (stressMatch) result.stressLevel = Number(stressMatch[1]);
-  } catch (e) {
-    console.error("parseBodyCondition: stress parse failed", e, params.stressRaw);
-  }
-
-  return result;
+  return Array.from(byDate.values()).sort((a, b) => a.date.localeCompare(b.date));
 }

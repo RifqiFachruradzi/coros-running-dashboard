@@ -129,11 +129,17 @@ disyaratkan spesifikasi otorisasi MCP.
 discovery/registrasi persis, serta format respons tool COROS di server MCP
 publik ini. Parser di `lib/coros-parsers.ts` ditulis berdasarkan format teks
 yang benar-benar teramati untuk `querySportRecords`,
-`queryFitnessAssessmentOverview`, dan `queryTrainingLoadAssessment`; tiga
-tool kondisi tubuh (`queryRestingHeartRate`, `querySleepData`,
-`queryStressLevel`) belum pernah dicoba sehingga parsernya best-effort dan
-tidak akan menjatuhkan seluruh sync kalau formatnya meleset — cek Vercel
-function logs setelah run pertama dan sesuaikan regex-nya bila perlu.
+`queryFitnessAssessmentOverview`, `queryTrainingLoadAssessment`,
+`queryRestingHeartRate`, `querySleepOverview`, dan `queryStressLevel`. Hanya
+`querySportRecords` yang wajib berhasil. Kalau tool lain gagal, sync tetap
+jalan dan errornya dicatat di `warnings` hasil sync (lihat Vercel function
+logs).
+
+Semua tool dipanggil dalam **satu sesi MCP**, dengan satu kali pengecekan
+token. Dengan begitu refresh token tidak dipakai berkali-kali secara paralel,
+yang bisa membuat COROS mencabut koneksi. Setelah sync sempat mati, sync
+berikutnya otomatis mengambil lari sejak 3 hari sebelum lari terakhir yang
+tersimpan (maksimal 120 hari ke belakang).
 
 Tidak ada webhook dari COROS — sinkronisasi selalu berbentuk polling
 terjadwal, bukan push instan tiap kali watch selesai sync ke app COROS.

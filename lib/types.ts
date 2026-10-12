@@ -49,4 +49,6 @@ export interface SyncResult {
   newSnapshots: number;
   committed: boolean;
   error?: string;
+  /** Optional COROS tools that failed without stopping the sync */
+  warnings?: string[];
 }

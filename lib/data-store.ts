@@ -79,23 +79,43 @@ export function mergeRuns(
   return { merged, addedCount: added };
 }
 
-/** Merge daily snapshots (fitness/load/body) by date, one entry per day. */
+/**
+ * Merge daily snapshots (fitness/load/body) by date, one entry per day.
+ * `changedCount` also counts days whose values changed (e.g. a sleep score
+ * that COROS only filled in after the previous sync), so those get committed.
+ */
 function mergeByDate<T extends { date: string }>(
   existing: T[],
-  incoming: T[]
-): { merged: T[]; addedCount: number } {
+  incoming: T[],
+  combine: (old: T, next: T) => T = (_old, next) => next
+): { merged: T[]; addedCount: number; changedCount: number } {
   const byDate = new Map(existing.map((s) => [s.date, s]));
   let added = 0;
+  let changed = 0;
   for (const snap of incoming) {
-    if (!byDate.has(snap.date)) added++;
-    byDate.set(snap.date, snap);
+    const old = byDate.get(snap.date);
+    const next = old ? combine(old, snap) : snap;
+    if (!old) added++;
+    else if (JSON.stringify(old) !== JSON.stringify(next)) changed++;
+    byDate.set(snap.date, next);
   }
   const merged = Array.from(byDate.values()).sort((a, b) =>
     a.date.localeCompare(b.date)
   );
-  return { merged, addedCount: added };
+  return { merged, addedCount: added, changedCount: changed };
 }
 
-export const mergeFitnessSnapshots = mergeByDate<FitnessSnapshot>;
-export const mergeLoadSnapshots = mergeByDate<LoadSnapshot>;
-export const mergeBodySnapshots = mergeByDate<BodySnapshot>;
+export const mergeFitnessSnapshots = (existing: FitnessSnapshot[], incoming: FitnessSnapshot[]) =>
+  mergeByDate(existing, incoming);
+export const mergeLoadSnapshots = (existing: LoadSnapshot[], incoming: LoadSnapshot[]) =>
+  mergeByDate(existing, incoming);
+// Body fields come from three separate tools; one failing must not wipe the
+// values another sync already stored for that day.
+export const mergeBodySnapshots = (existing: BodySnapshot[], incoming: BodySnapshot[]) =>
+  mergeByDate(existing, incoming, (old, next) => ({
+    date: next.date,
+    restingHeartRate: next.restingHeartRate ?? old.restingHeartRate,
+    sleepScore: next.sleepScore ?? old.sleepScore,
+    sleepDurationMinutes: next.sleepDurationMinutes ?? old.sleepDurationMinutes,
+    stressLevel: next.stressLevel ?? old.stressLevel,
+  }));
