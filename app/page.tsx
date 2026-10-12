@@ -21,8 +21,7 @@ import {
 import { programProgress } from "@/lib/coach";
 import { loadDashboardStatus } from "@/lib/token-store";
 import { AppShell } from "@/components/AppShell";
-import { loadGoals, loadRoutes } from "@/lib/user-store";
-import { suggestRoutes } from "@/lib/insights";
+import { loadGoals } from "@/lib/user-store";
 import { StatTile } from "@/components/StatTile";
 import { ChartCard } from "@/components/ChartCard";
 import { SectionHeader } from "@/components/SectionHeader";
@@ -61,7 +60,7 @@ function daysLeftText(days: number): string {
 }
 
 export default async function DashboardPage() {
-  const [runs, fitnessHistory, loadHistory, bodyHistory, status, coach, goals, routes] = await Promise.all([
+  const [runs, fitnessHistory, loadHistory, bodyHistory, status, coach, goals] = await Promise.all([
     readRuns(),
     readFitnessHistory(),
     readLoadHistory(),
@@ -69,19 +68,12 @@ export default async function DashboardPage() {
     loadDashboardStatus(),
     readRecommendation(),
     loadGoals(),
-    loadRoutes(),
   ]);
 
   const today = todayInJakarta();
   const sortedRuns = [...runs].sort((a, b) => b.startTimestamp - a.startTimestamp);
   const lastRun = sortedRuns[0];
   const last7 = summarize(sortedRuns, 7);
-  const last30 = summarize(sortedRuns, 30);
-  const tomorrowKm = coach.recommendation?.tomorrow.distanceKm ?? null;
-  // Only suggest a saved route when whole laps of it land near tomorrow's distance.
-  const bestRoute = tomorrowKm ? suggestRoutes(routes, tomorrowKm, last30.avgPace, 1)[0] : undefined;
-  const tomorrowRoute =
-    bestRoute && tomorrowKm && Math.abs(bestRoute.diffKm) <= tomorrowKm * 0.3 ? bestRoute : undefined;
   const records = personalRecords(sortedRuns);
   const latestFitness = fitnessHistory[fitnessHistory.length - 1];
   const previousFitness = fitnessHistory[fitnessHistory.length - 2];
@@ -171,7 +163,7 @@ export default async function DashboardPage() {
               />
             </div>
             <div className="flex min-w-0 flex-[1_1_260px] flex-col gap-5">
-              <TomorrowCard recommendation={coach.recommendation} route={tomorrowRoute} />
+              <TomorrowCard recommendation={coach.recommendation} />
               <LastRunCard run={lastRun} />
             </div>
           </div>

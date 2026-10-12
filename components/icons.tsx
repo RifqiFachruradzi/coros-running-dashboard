@@ -63,12 +63,6 @@ const PATHS = {
   ),
   pulse: <path d="M3 12h4l3 8 4-16 3 8h4" />,
   trend: <path d="M3 17l5-6 4 3 6-8" />,
-  map: (
-    <>
-      <path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z" />
-      <path d="M9 4v14M15 6v14" />
-    </>
-  ),
   history: (
     <>
       <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -83,18 +77,6 @@ const PATHS = {
       <path d="M10 11v6M14 11v6" />
       <path d="M6 7l1 13h10l1-13" />
       <path d="M9 7V4h6v3" />
-    </>
-  ),
-  crosshair: (
-    <>
-      <circle cx="12" cy="12" r="8" />
-      <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
-    </>
-  ),
-  undo: (
-    <>
-      <path d="M9 14L4 9l5-5" />
-      <path d="M4 9h11a5 5 0 0 1 0 10h-3" />
     </>
   ),
   chevronRight: <path d="M9 6l6 6-6 6" />,

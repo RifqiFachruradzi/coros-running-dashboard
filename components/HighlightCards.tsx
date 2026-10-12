@@ -3,8 +3,7 @@ import { id } from "date-fns/locale";
 import type { RunActivity } from "@/lib/types";
 import type { Readiness, Recommendation } from "@/lib/coach";
 import Link from "next/link";
-import { formatClock, formatDay, formatPace } from "@/lib/aggregate";
-import type { RouteSuggestion } from "@/lib/insights";
+import { formatDay, formatPace } from "@/lib/aggregate";
 import { Icon } from "@/components/icons";
 
 export const READINESS_LABEL: Record<Readiness, { text: string; color: string }> = {
@@ -36,14 +35,7 @@ function CardIcon({ name }: { name: "calendar" | "runner" }) {
 }
 
 /** Yellow card: tomorrow's session from the AI coach. */
-export function TomorrowCard({
-  recommendation,
-  route,
-}: {
-  recommendation: Recommendation | null;
-  /** The saved route that best fits tomorrow's distance */
-  route?: RouteSuggestion;
-}) {
+export function TomorrowCard({ recommendation }: { recommendation: Recommendation | null }) {
   const tomorrow = recommendation?.tomorrow;
   const readiness = recommendation ? READINESS_LABEL[recommendation.readiness] : null;
 
@@ -83,21 +75,6 @@ export function TomorrowCard({
         <p className="text-sm">Routine AI membuatnya setiap malam sekitar pukul 23:30 WIB.</p>
       )}
       {tomorrow?.notes && <p className="text-sm leading-relaxed">{tomorrow.notes}</p>}
-      {route && (
-        <Link
-          href="/rute"
-          className="link flex items-center gap-2 rounded-2xl px-3 py-2.5 text-xs"
-          style={{ background: "rgba(10, 10, 12, 0.12)" }}
-        >
-          <Icon name="map" size={16} />
-          <span className="min-w-0 flex-1">
-            Rute: <strong>{route.route.name}</strong>
-            {route.laps > 1 && ` ${route.laps}×`} = {route.totalKm.toFixed(1)} km
-            {route.estimatedSeconds && ` · ±${formatClock(route.estimatedSeconds)}`}
-          </span>
-          <Icon name="chevronRight" size={14} />
-        </Link>
-      )}
     </div>
   );
 }

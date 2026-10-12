@@ -1,24 +1,21 @@
 "use server";
 
-// Server Actions for goals and saved routes. Like app/actions.ts they are
+// Server Actions for goals. Like app/actions.ts they are
 // POSTs to dashboard pages, so proxy.ts's login check guards them. Input
 // from the browser is validated here before anything is stored.
 
 import { refresh } from "next/cache";
 import { randomUUID } from "crypto";
 import { todayInJakarta } from "@/lib/aggregate";
-import { routeDistanceKm, type Goal, type GoalKind, type RouteShape, type SavedRoute } from "@/lib/insights";
+import type { Goal, GoalKind } from "@/lib/insights";
 import { isStorageConfigured } from "@/lib/token-store";
-import { loadGoals, loadRoutes, saveGoals, saveRoutes } from "@/lib/user-store";
+import { loadGoals, saveGoals } from "@/lib/user-store";
 import type { ActionResult } from "./actions";
 
 const STORAGE_MISSING = "Upstash Redis belum dikonfigurasi, jadi data belum bisa disimpan.";
 const MAX_GOALS = 20;
-const MAX_ROUTES = 50;
-const MAX_POINTS = 500;
 
 const GOAL_KINDS: GoalKind[] = ["weekly_km", "monthly_km", "yearly_km", "weekly_runs", "race"];
-const ROUTE_SHAPES: RouteShape[] = ["oneway", "loop", "outback"];
 
 async function persist(write: () => Promise<void>, failure: string): Promise<ActionResult> {
   if (!isStorageConfigured()) return { ok: false, error: STORAGE_MISSING };
@@ -87,53 +84,4 @@ export async function deleteGoal(id: string): Promise<ActionResult> {
     const goals = await loadGoals();
     await saveGoals(goals.filter((g) => g.id !== id));
   }, "Gagal menghapus target.");
-}
-
-export async function saveRoute(input: {
-  name: string;
-  points: [number, number][];
-  shape: RouteShape;
-}): Promise<ActionResult> {
-  const name = String(input?.name ?? "").trim().slice(0, 60);
-  if (!name) return { ok: false, error: "Beri nama rute dulu." };
-  if (!ROUTE_SHAPES.includes(input?.shape)) return { ok: false, error: "Bentuk rute tidak dikenal." };
-
-  const raw = Array.isArray(input?.points) ? input.points : [];
-  const points = raw
-    .filter(
-      (p): p is [number, number] =>
-        Array.isArray(p) &&
-        p.length === 2 &&
-        Number.isFinite(p[0]) &&
-        Number.isFinite(p[1]) &&
-        Math.abs(p[0]) <= 90 &&
-        Math.abs(p[1]) <= 180
-    )
-    .map(([lat, lng]): [number, number] => [Math.round(lat * 1e6) / 1e6, Math.round(lng * 1e6) / 1e6]);
-  if (points.length < 2 || points.length !== raw.length || points.length > MAX_POINTS) {
-    return { ok: false, error: "Rute perlu minimal 2 titik yang valid." };
-  }
-
-  // Distance is computed here, never trusted from the browser.
-  const route: SavedRoute = {
-    id: randomUUID(),
-    name,
-    points,
-    shape: input.shape,
-    distanceKm: Math.round(routeDistanceKm(points, input.shape) * 1000) / 1000,
-    createdAt: new Date().toISOString(),
-  };
-
-  return persist(async () => {
-    const routes = await loadRoutes();
-    if (routes.length >= MAX_ROUTES) throw new Error("too many routes");
-    await saveRoutes([...routes, route]);
-  }, "Gagal menyimpan rute.");
-}
-
-export async function deleteRoute(id: string): Promise<ActionResult> {
-  return persist(async () => {
-    const routes = await loadRoutes();
-    await saveRoutes(routes.filter((r) => r.id !== id));
-  }, "Gagal menghapus rute.");
 }

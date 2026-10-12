@@ -6,7 +6,6 @@ const ITEMS: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Ringkasan", icon: "home" },
   { href: "/riwayat", label: "Riwayat latihan", icon: "history" },
   { href: "/target", label: "Target", icon: "target" },
-  { href: "/rute", label: "Rute", icon: "map" },
   { href: "/rekor", label: "Performa terbaik", icon: "medal" },
   { href: "/chat", label: "Chat dengan Coach", icon: "chat" },
 ];
