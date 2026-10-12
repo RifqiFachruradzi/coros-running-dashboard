@@ -2,6 +2,7 @@
 
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 import { ChartEmpty } from "@/components/ChartEmpty";
+import { ChartReveal } from "@/components/ChartReveal";
 
 export interface HeroStat {
   label: string;
@@ -35,7 +36,7 @@ export function VolumeHero({
         </span>
       </div>
 
-      <div className="mt-3 h-44 px-2">
+      <ChartReveal className="mt-3 h-44 px-2">
         {hasData ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={volume} margin={{ top: 12, right: 12, left: 12, bottom: 0 }}>
@@ -79,7 +80,7 @@ export function VolumeHero({
         ) : (
           <ChartEmpty text="Belum ada lari dalam 8 minggu terakhir." />
         )}
-      </div>
+      </ChartReveal>
 
       <dl className="mt-4 grid grid-cols-3 text-center">
         {stats.map((stat, i) => (

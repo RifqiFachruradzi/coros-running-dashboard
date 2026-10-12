@@ -19,6 +19,7 @@ import {
   tooltipLabelStyle,
 } from "@/components/chart-theme";
 import { ChartEmpty } from "@/components/ChartEmpty";
+import { ChartReveal } from "@/components/ChartReveal";
 
 export interface TrendPoint {
   x: string; // yyyy-MM-dd
@@ -60,7 +61,7 @@ export function TrendLineChart({
   if (clean.length === 0) return <ChartEmpty text="Belum ada data yang cukup." />;
 
   return (
-    <div className="h-44">
+    <ChartReveal className="h-44">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={clean} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
           <CartesianGrid stroke="var(--gridline)" vertical={false} />
@@ -109,6 +110,6 @@ export function TrendLineChart({
           />
         </AreaChart>
       </ResponsiveContainer>
-    </div>
+    </ChartReveal>
   );
 }

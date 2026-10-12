@@ -21,6 +21,7 @@ import {
   tooltipLabelStyle,
 } from "@/components/chart-theme";
 import { ChartEmpty } from "@/components/ChartEmpty";
+import { ChartReveal } from "@/components/ChartReveal";
 
 export function LoadChart({ data }: { data: LoadSnapshot[] }) {
   const clean = data.filter((d) => d.shortTermLoad !== null || d.longTermLoad !== null);
@@ -28,7 +29,7 @@ export function LoadChart({ data }: { data: LoadSnapshot[] }) {
   if (clean.length === 0) return <ChartEmpty text="Belum ada data training load." />;
 
   return (
-    <div className="h-44">
+    <ChartReveal className="h-44">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={clean} margin={{ top: 0, right: 12, left: 0, bottom: 0 }}>
           <CartesianGrid stroke="var(--gridline)" vertical={false} />
@@ -86,6 +87,6 @@ export function LoadChart({ data }: { data: LoadSnapshot[] }) {
           />
         </LineChart>
       </ResponsiveContainer>
-    </div>
+    </ChartReveal>
   );
 }
