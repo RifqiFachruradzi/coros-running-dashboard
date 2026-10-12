@@ -3,22 +3,28 @@
 
 import { NextResponse } from "next/server";
 import { loadTokens } from "@/lib/token-store";
+import { checkGitHubAccess } from "@/lib/github";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const tokens = await loadTokens();
+  const [tokens, github] = await Promise.all([loadTokens(), checkGitHubAccess()]);
 
   return NextResponse.json({
     corosAuthorized: !!tokens,
     corosTokenExpiresAt: tokens ? new Date(tokens.expiresAt).toISOString() : null,
+    github,
     envConfigured: {
       COROS_REDIRECT_URI: !!process.env.COROS_REDIRECT_URI,
       GITHUB_TOKEN: !!process.env.GITHUB_TOKEN,
       GITHUB_OWNER: !!process.env.GITHUB_OWNER,
       GITHUB_REPO: !!process.env.GITHUB_REPO,
+      GITHUB_BRANCH: !!process.env.GITHUB_BRANCH,
       CRON_SECRET: !!process.env.CRON_SECRET,
       DASHBOARD_PASSWORD: !!process.env.DASHBOARD_PASSWORD,
+      COACH_LLM_BASE_URL: !!process.env.COACH_LLM_BASE_URL,
+      COACH_LLM_API_KEY: !!process.env.COACH_LLM_API_KEY,
+      COACH_LLM_MODEL: !!process.env.COACH_LLM_MODEL,
       KV: !!(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL),
     },
   });

@@ -68,17 +68,52 @@ export async function commitDataFiles(
       continue; // no change, skip the commit entirely
     }
 
-    await octokit.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      path: file.path,
-      message,
-      content: encoded,
-      sha: existingSha,
-      branch,
-    });
+    try {
+      await octokit.repos.createOrUpdateFileContents({
+        owner,
+        repo,
+        path: file.path,
+        message,
+        content: encoded,
+        sha: existingSha,
+        branch,
+      });
+    } catch (err: any) {
+      // GitHub answers 404 (not 403) when the token can't see a private repo.
+      throw new Error(
+        `Commit ${file.path} ke ${owner}/${repo}@${branch} gagal (${err.status}): ${err.message}. ` +
+          "Cek GITHUB_OWNER/GITHUB_REPO/GITHUB_BRANCH dan akses GITHUB_TOKEN ke repo ini (Contents: Read and write)."
+      );
+    }
     committedAny = true;
   }
 
   return committedAny;
+}
+
+/** For /api/health: can the token see the repo and branch, and may it push? */
+export async function checkGitHubAccess(): Promise<{
+  target: string;
+  ok: boolean;
+  canPush?: boolean;
+  error?: string;
+}> {
+  const target = `${owner}/${repo}@${branch}`;
+  try {
+    const octokit = client();
+    const { data } = await octokit.repos.get({ owner, repo });
+    await octokit.repos.getBranch({ owner, repo, branch });
+    return { target, ok: true, canPush: data.permissions?.push };
+  } catch (err: any) {
+    return {
+      target,
+      ok: false,
+      error:
+        err.status === 404
+          ? "Repo atau branch tidak ditemukan — nama salah, atau GITHUB_TOKEN tidak punya akses ke repo ini."
+          : err.status === 401
+          ? "GITHUB_TOKEN tidak valid atau sudah kedaluwarsa."
+          : err.message,
+    };
+  }
 }
