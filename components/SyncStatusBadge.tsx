@@ -8,9 +8,9 @@ const STALE_AFTER_MS = 36 * 60 * 60 * 1000;
 type Tone = "good" | "warning" | "critical" | "neutral";
 
 const TONE_COLOR: Record<Tone, string> = {
-  good: "var(--status-good)",
-  warning: "var(--status-warning)",
-  critical: "var(--status-critical)",
+  good: "var(--blue)",
+  warning: "var(--yellow)",
+  critical: "var(--pink)",
   neutral: "var(--text-muted)",
 };
 
@@ -62,7 +62,7 @@ export function SyncStatusBadge({ status }: { status: DashboardStatus }) {
 
   return (
     <div className="flex min-w-0 flex-col items-start gap-1 sm:items-end">
-      <div className="pill py-1.5">
+      <div className="pill min-h-[40px] px-4 font-medium" style={{ background: "var(--surface-2)", color: "var(--text-secondary)" }}>
         <span aria-hidden className="dot" style={{ background: TONE_COLOR[tone] }} />
         <span>{text}</span>
         {reconnect && (
@@ -76,7 +76,7 @@ export function SyncStatusBadge({ status }: { status: DashboardStatus }) {
         )}
       </div>
       {detail && (
-        <p className="max-w-xs break-words text-xs sm:text-right" style={{ color: "var(--text-muted)" }}>
+        <p className="max-w-xs break-words text-xs sm:text-right" style={{ color: "var(--text-secondary)" }}>
           {detail}
         </p>
       )}

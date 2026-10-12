@@ -1,7 +1,7 @@
 const STEPS = [
   {
     title: "Pilih program",
-    text: "Terima salah satu program di bawah. Hari kamu menerimanya dihitung sebagai hari pertama.",
+    text: "Terima salah satu program dari Coach. Hari kamu menerimanya dihitung sebagai hari pertama.",
   },
   {
     title: "Lari seperti biasa",
@@ -13,26 +13,23 @@ const STEPS = [
   },
 ];
 
+const TONES = ["tone-pink", "tone-yellow", "tone-blue"];
+
 export function NoProgramCard() {
   return (
-    <div className="card flex flex-col p-5 sm:p-6">
+    <div data-animate="rise" className="card flex flex-col p-5 sm:p-6">
       <p className="eyebrow">Program latihan</p>
-      <h3 className="mt-1 text-lg font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>
-        Belum ada program aktif
-      </h3>
+      <h3 className="mt-0.5 text-lg font-semibold">Belum ada program aktif</h3>
       <ol className="mt-4 space-y-4">
         {STEPS.map((step, i) => (
           <li key={step.title} className="flex gap-3">
             <span
-              className="inset flex h-7 w-7 shrink-0 items-center justify-center text-xs font-semibold"
-              style={{ color: "var(--text-primary)" }}
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold ${TONES[i]}`}
             >
               {i + 1}
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                {step.title}
-              </p>
+              <p className="text-sm font-semibold">{step.title}</p>
               <p className="mt-0.5 text-sm" style={{ color: "var(--text-secondary)" }}>
                 {step.text}
               </p>

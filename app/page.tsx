@@ -1,6 +1,4 @@
-import Link from "next/link";
 import { isAuthEnabled } from "@/lib/auth";
-import { logout } from "./login/actions";
 import {
   readRuns,
   readFitnessHistory,
@@ -16,31 +14,49 @@ import {
   formatPace,
   formatClock,
   formatDay,
+  formatShortDay,
+  daysBetween,
+  todayInJakarta,
   type WeekProgress,
 } from "@/lib/aggregate";
 import { programProgress } from "@/lib/coach";
 import { loadDashboardStatus } from "@/lib/token-store";
+import { Sidebar } from "@/components/Sidebar";
 import { StatTile } from "@/components/StatTile";
 import { ChartCard } from "@/components/ChartCard";
 import { SectionHeader } from "@/components/SectionHeader";
 import { TrendLineChart } from "@/components/TrendLineChart";
 import { LoadChart } from "@/components/LoadChart";
-import { DistanceBarChart } from "@/components/DistanceBarChart";
 import { ActivityTable } from "@/components/ActivityTable";
 import { SyncStatusBadge } from "@/components/SyncStatusBadge";
-import { WeeklyTargetCard } from "@/components/WeeklyTargetCard";
-import { RecommendationCard } from "@/components/RecommendationCard";
+import { VolumeHero } from "@/components/VolumeHero";
+import { TomorrowCard, LastRunCard } from "@/components/HighlightCards";
+import { GoalCard } from "@/components/GoalCard";
 import { ActiveProgramCard } from "@/components/ActiveProgramCard";
 import { ProgramOfferCard } from "@/components/ProgramOfferCard";
 import { NoProgramCard } from "@/components/NoProgramCard";
+import { RecentRuns, BodyTiles, CoachNote } from "@/components/SidePanel";
+import { Motion } from "@/components/Motion";
 
 export const revalidate = 0; // always read the latest committed data
 
 const DEFAULT_WEEKLY_TARGET_KM = 20;
 
+// Distances the "next milestone" goal card climbs through.
+const MILESTONES = [
+  { label: "5K", km: 5 },
+  { label: "10K", km: 10 },
+  { label: "Half marathon", km: 21.1 },
+  { label: "Marathon", km: 42.2 },
+];
+
 function weeklyTargetKm(): number {
   const parsed = Number(process.env.WEEKLY_TARGET_KM);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_WEEKLY_TARGET_KM;
+}
+
+function daysLeftText(days: number): string {
+  return days <= 1 ? "Hari terakhir" : `${days} hari lagi`;
 }
 
 export default async function DashboardPage() {
@@ -53,12 +69,13 @@ export default async function DashboardPage() {
     readRecommendation(),
   ]);
 
+  const today = todayInJakarta();
   const sortedRuns = [...runs].sort((a, b) => b.startTimestamp - a.startTimestamp);
   const lastRun = sortedRuns[0];
-  const last30 = summarize(sortedRuns, 30);
   const last7 = summarize(sortedRuns, 7);
   const records = personalRecords(sortedRuns);
   const latestFitness = fitnessHistory[fitnessHistory.length - 1];
+  const previousFitness = fitnessHistory[fitnessHistory.length - 2];
   const latestLoad = loadHistory[loadHistory.length - 1];
 
   const active = status.activeProgram;
@@ -74,15 +91,19 @@ export default async function DashboardPage() {
         weekStart: programWeek.week.start,
       }
     : weekProgress(sortedRuns, weeklyTargetKm());
-  const weekSubtitle =
-    active && programWeek
-      ? `Minggu ${programWeek.currentWeek} dari ${active.program.durationWeeks} · ${active.program.title}`
-      : undefined;
+  const weekDone = thisWeek.km >= thisWeek.targetKm;
+
+  const vo2Delta =
+    latestFitness?.vo2max != null && previousFitness?.vo2max != null
+      ? latestFitness.vo2max - previousFitness.vo2max
+      : null;
+
+  const longestKm = records.longest?.distanceKm ?? 0;
+  const nextMilestone = MILESTONES.find((m) => m.km > longestKm) ?? MILESTONES[MILESTONES.length - 1];
 
   const chronological = [...sortedRuns].reverse();
   const paceSeries = chronological.map((r) => ({ x: r.date, y: r.avgPaceSecPerKm }));
   const hrSeries = chronological.map((r) => ({ x: r.date, y: r.avgHeartRate }));
-  const volumeSeries = weeklyVolume(sortedRuns, 8);
 
   const restingHrSeries = bodyHistory.map((b) => ({ x: b.date, y: b.restingHeartRate }));
   const sleepSeries = bodyHistory.map((b) => ({ x: b.date, y: b.sleepScore }));
@@ -92,238 +113,281 @@ export default async function DashboardPage() {
   );
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0">
-          <p className="eyebrow">COROS · Dashboard lari</p>
-          <h1
-            className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl"
-            style={{ color: "var(--text-primary)" }}
-          >
-            Dashboard Lari
-          </h1>
-          <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
-            {lastRun
-              ? `Lari terakhir ${formatDay(lastRun.date)} · ${lastRun.distanceKm.toFixed(2)} km`
-              : "Belum ada lari tercatat"}{" "}
-            · {sortedRuns.length} aktivitas
-          </p>
-        </div>
-        <div className="flex flex-col items-end gap-2">
-          <SyncStatusBadge status={status} />
-          <div className="flex items-center gap-2">
-            <Link href="/chat" className="btn-secondary">
-              Chat dengan Coach
-            </Link>
-            {isAuthEnabled() && (
-              <form action={logout}>
-                <button type="submit" className="btn-secondary">
-                  Keluar
-                </button>
-              </form>
+    <main className="min-h-dvh px-3 py-4 sm:px-6 sm:py-8 lg:py-10">
+      <div className="app-shell mx-auto flex max-w-[1360px] flex-col gap-6 p-3 sm:p-5 lg:flex-row lg:flex-wrap lg:items-start">
+        <Sidebar active="/#ringkasan" showLogout={isAuthEnabled()} />
+
+        <div id="ringkasan" className="flex min-w-0 flex-[999_1_600px] scroll-mt-6 flex-col gap-8 lg:py-1.5">
+          <header className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="eyebrow">COROS · {formatDay(today)}</p>
+              <h1 className="text-2xl font-bold">Dashboard Lari</h1>
+              <p className="mt-0.5 text-sm" style={{ color: "var(--text-secondary)" }}>
+                {lastRun
+                  ? `Lari terakhir ${formatDay(lastRun.date)} · ${lastRun.distanceKm.toFixed(2)} km`
+                  : "Belum ada lari tercatat"}{" "}
+                · {sortedRuns.length} aktivitas
+              </p>
+            </div>
+            <SyncStatusBadge status={status} />
+          </header>
+
+          {/* Hero */}
+          <div className="flex flex-wrap gap-5">
+            <div className="min-w-0 flex-[999_1_460px]">
+              <VolumeHero
+                volume={weeklyVolume(sortedRuns, 8)}
+                stats={[
+                  {
+                    label: "Jarak 7 hari",
+                    value: `${last7.totalKm.toFixed(1)} km`,
+                    sub: `${last7.totalRuns} lari`,
+                  },
+                  {
+                    label: "Target minggu ini",
+                    value: `${thisWeek.km.toFixed(1)} / ${thisWeek.targetKm} km`,
+                    sub: weekDone
+                      ? "Target tercapai"
+                      : programWeek && active
+                      ? `Minggu ${programWeek.currentWeek} · ${active.program.title}`
+                      : `Sisa ${(thisWeek.targetKm - thisWeek.km).toFixed(1)} km`,
+                  },
+                  {
+                    label: "VO2max",
+                    value:
+                      latestFitness?.vo2max != null
+                        ? `${latestFitness.vo2max}${vo2Delta ? ` ${vo2Delta > 0 ? "▲" : "▼"}${Math.abs(vo2Delta)}` : ""}`
+                        : "—",
+                    sub: latestFitness?.runningLevel != null ? `Level ${latestFitness.runningLevel}` : undefined,
+                  },
+                ]}
+              />
+            </div>
+            <div className="flex min-w-0 flex-[1_1_260px] flex-col gap-5">
+              <TomorrowCard recommendation={coach.recommendation} />
+              <LastRunCard run={lastRun} />
+            </div>
+          </div>
+
+          {/* Goals: each card leaves 28px for its overlapping icon badge */}
+          <div className="grid grid-cols-1 gap-x-5 gap-y-12 pt-7 sm:grid-cols-2 xl:grid-cols-3">
+            {active && progress ? (
+              <GoalCard
+                icon="flag"
+                tone="pink"
+                title={active.program.title}
+                subtitle={
+                  progress.finished
+                    ? "Program sudah berakhir"
+                    : `Minggu ${progress.currentWeek} dari ${active.program.durationWeeks}`
+                }
+                ratio={progress.sessions.length ? progress.completedCount / progress.sessions.length : 0}
+                footer={`${progress.completedCount} / ${progress.sessions.length} sesi`}
+                badge={
+                  progress.finished ? "Berakhir" : daysLeftText(daysBetween(today, progress.endDate) + 1)
+                }
+              />
+            ) : (
+              <GoalCard
+                icon="flag"
+                tone="pink"
+                title="Belum ada program"
+                subtitle="Pilih program dari Coach di bawah"
+                ratio={0}
+                footer="0 sesi"
+                badge="Pilih program"
+              />
             )}
+            <GoalCard
+              icon="target"
+              tone="yellow"
+              title="Target mingguan"
+              subtitle={`${thisWeek.targetKm} km / minggu${programWeek ? " · dari program" : ""}`}
+              ratio={thisWeek.targetKm > 0 ? thisWeek.km / thisWeek.targetKm : 1}
+              footer={`${thisWeek.km.toFixed(1)} / ${thisWeek.targetKm} km`}
+              badge={weekDone ? "Tercapai" : daysLeftText(thisWeek.daysLeft)}
+            />
+            <GoalCard
+              icon="medal"
+              tone="blue"
+              title={`Menuju ${nextMilestone.label}`}
+              subtitle={
+                records.longest
+                  ? `Lari terjauh ${longestKm.toFixed(2)} km · ${formatShortDay(records.longest.date)}`
+                  : "Belum ada lari tercatat"
+              }
+              ratio={longestKm / nextMilestone.km}
+              footer={`${longestKm.toFixed(2)} / ${nextMilestone.km} km`}
+              badge="Rekor"
+            />
           </div>
-        </div>
-      </header>
 
-      {/* Minggu ini */}
-      <section className="mt-8 grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-5">
-        <div className="min-w-0 lg:col-span-2">
-          <WeeklyTargetCard progress={thisWeek} subtitle={weekSubtitle} />
-        </div>
-        <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-4 lg:col-span-3">
-          <StatTile label="Jarak 7 hari terakhir" value={last7.totalKm.toFixed(1)} unit="km" />
-          <StatTile label="Lari 30 hari terakhir" value={String(last30.totalRuns)} unit="sesi" />
-          <StatTile label="Pace rata-rata 30 hari" value={formatPace(last30.avgPace)} unit="/km" />
-          <StatTile
-            label="VO2max"
-            value={latestFitness?.vo2max != null ? String(latestFitness.vo2max) : "—"}
-            unit={latestFitness?.runningLevel != null ? `Level ${latestFitness.runningLevel}` : undefined}
-          />
-        </div>
-      </section>
+          {/* Pelatih AI */}
+          <section id="program" className="scroll-mt-6">
+            <SectionHeader
+              title="Program latihan"
+              description="Rekomendasi dan program dari Pelatih AI, dibuat setiap malam dari data COROS."
+            />
 
-      {/* Pelatih AI */}
-      <section className="mt-12">
-        <SectionHeader
-          title="Pelatih AI"
-          description="Rekomendasi dan program latihan, dibuat setiap malam dari data COROS."
-        />
-
-        {coach.errors.length > 0 && (
-          <div
-            className="card mb-4 p-4 text-sm"
-            style={{ borderColor: "var(--status-critical)", color: "var(--text-secondary)" }}
-          >
-            <p className="mb-1 font-semibold" style={{ color: "var(--text-primary)" }}>
-              File rekomendasi dari AI tidak valid, jadi tidak ditampilkan.
-            </p>
-            <ul className="list-disc pl-5 text-xs">
-              {coach.errors.slice(0, 5).map((error, i) => (
-                <li key={i}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {coach.recommendation ? (
-            <RecommendationCard recommendation={coach.recommendation} />
-          ) : (
-            coach.errors.length === 0 && (
-              <div className="card p-5 text-sm" style={{ color: "var(--text-secondary)" }}>
-                Belum ada rekomendasi. Routine AI membuatnya setiap malam sekitar pukul 23:30 WIB.
+            {coach.errors.length > 0 && (
+              <div className="card tone-pink mb-4 p-4 text-sm">
+                <p className="mb-1 font-semibold">File rekomendasi dari AI tidak valid, jadi tidak ditampilkan.</p>
+                <ul className="list-disc pl-5 text-xs">
+                  {coach.errors.slice(0, 5).map((error, i) => (
+                    <li key={i}>{error}</li>
+                  ))}
+                </ul>
               </div>
-            )
-          )}
-          {active && progress ? (
-            <ActiveProgramCard active={active} progress={progress} />
-          ) : (
-            coach.recommendation && <NoProgramCard />
-          )}
-        </div>
+            )}
 
-        {coach.recommendation && (
-          <>
-            <h3 className="mb-3 mt-8 text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
-              {active ? "Program lain yang disarankan" : "Pilih program latihan"}
-            </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {coach.recommendation.programs.map((p) => (
-                <ProgramOfferCard
-                  key={p.id}
-                  program={p}
-                  activeTitle={active?.program.title ?? null}
-                  isActive={active?.program.id === p.id}
-                  storageReady={status.storage === "ok"}
+            <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+              {active && progress ? <ActiveProgramCard active={active} progress={progress} /> : <NoProgramCard />}
+              {coach.recommendation && (
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-base font-semibold">
+                    {active ? "Program lain dari Coach" : "Pilih program latihan"}
+                  </h3>
+                  {coach.recommendation.programs.map((p, i) => (
+                    <ProgramOfferCard
+                      key={p.id}
+                      program={p}
+                      index={i}
+                      activeTitle={active?.program.title ?? null}
+                      isActive={active?.program.id === p.id}
+                      storageReady={status.storage === "ok"}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Tren latihan */}
+          <section id="tren" className="scroll-mt-6">
+            <SectionHeader title="Tren latihan" description="Perkembangan per sesi lari." />
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3">
+              <ChartCard
+                title="Pace per lari"
+                subtitle="Menit per km · makin tinggi makin cepat"
+                headline={lastRun ? formatPace(lastRun.avgPaceSecPerKm) : undefined}
+                headlineColor="var(--blue-text)"
+              >
+                <TrendLineChart data={paceSeries} color="var(--blue)" format="pace" unit="/km" />
+              </ChartCard>
+              <ChartCard
+                title="Detak jantung"
+                subtitle="Rata-rata BPM per sesi"
+                headline={lastRun?.avgHeartRate != null ? String(lastRun.avgHeartRate) : undefined}
+                headlineColor="var(--pink-text)"
+              >
+                <TrendLineChart data={hrSeries} color="var(--pink)" format="integer" unit="bpm" />
+              </ChartCard>
+              <ChartCard
+                title="Training load"
+                subtitle={latestLoad?.comment ? `Status terakhir: ${latestLoad.comment}` : "Jangka pendek vs panjang"}
+                headline={latestLoad?.loadRatio != null ? latestLoad.loadRatio.toFixed(2) : undefined}
+                headlineColor="var(--yellow-text)"
+              >
+                <LoadChart data={loadHistory} />
+              </ChartCard>
+            </div>
+          </section>
+
+          {/* Rekor & prediksi */}
+          <section>
+            <SectionHeader
+              title="Rekor pribadi & prediksi race"
+              description="Rekor dihitung dari pace rata-rata lari yang jaraknya minimal sejauh itu. Prediksi dari COROS."
+            />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+              <StatTile
+                solid
+                label="Lari terjauh"
+                value={records.longest ? records.longest.distanceKm.toFixed(2) : "—"}
+                unit={records.longest ? "km" : undefined}
+                note={records.longest ? formatDay(records.longest.date) : undefined}
+              />
+              {records.fastest.map((record) => (
+                <StatTile
+                  key={record.label}
+                  tone="pink"
+                  label={`${record.label} tercepat`}
+                  value={formatClock(record.seconds)}
+                  note={
+                    record.date
+                      ? `${formatShortDay(record.date)} · ${formatPace(record.paceSecPerKm)}/km`
+                      : `Belum ada lari sejauh ${record.label}`
+                  }
                 />
               ))}
-            </div>
-          </>
-        )}
-      </section>
-
-      {/* Rekor pribadi */}
-      <section className="mt-12">
-        <SectionHeader
-          title="Rekor pribadi"
-          description="Waktu 5K, 10K, dan half marathon dihitung dari pace rata-rata lari yang jaraknya minimal sejauh itu."
-        />
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          <StatTile
-            label="Lari terjauh"
-            value={records.longest ? records.longest.distanceKm.toFixed(2) : "—"}
-            unit={records.longest ? "km" : undefined}
-            delta={
-              records.longest ? { text: formatDay(records.longest.date), tone: "neutral" } : undefined
-            }
-          />
-          {records.fastest.map((record) => (
-            <StatTile
-              key={record.label}
-              label={`${record.label} tercepat`}
-              value={formatClock(record.seconds)}
-              delta={{
-                text: record.date
-                  ? `${formatDay(record.date)} · ${formatPace(record.paceSecPerKm)}/km`
-                  : `Belum ada lari sejauh ${record.label}`,
-                tone: "neutral",
-              }}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* Tren latihan */}
-      <section className="mt-12">
-        <SectionHeader title="Tren latihan" description="Perkembangan per sesi lari dan per minggu." />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <ChartCard title="Pace per lari" subtitle="Menit per km · makin tinggi makin cepat">
-            <TrendLineChart data={paceSeries} color="var(--series-1)" format="pace" unit="/km" />
-          </ChartCard>
-          <ChartCard title="Detak jantung rata-rata" subtitle="BPM per sesi lari">
-            <TrendLineChart data={hrSeries} color="var(--series-3)" format="integer" unit="bpm" />
-          </ChartCard>
-          <ChartCard title="Volume mingguan" subtitle="Total jarak per minggu (km), 8 minggu terakhir">
-            <DistanceBarChart data={volumeSeries} />
-          </ChartCard>
-          <ChartCard title="Training load" subtitle="Beban jangka pendek vs jangka panjang">
-            <LoadChart data={loadHistory} />
-          </ChartCard>
-        </div>
-      </section>
-
-      {/* Kesiapan latihan */}
-      {latestFitness && (
-        <section className="mt-12">
-          <SectionHeader
-            title="Kesiapan & prediksi race"
-            description={
-              latestLoad ? (
+              {latestFitness && (
                 <>
-                  Status beban latihan terakhir: <strong>{latestLoad.comment ?? "—"}</strong>
-                  {latestLoad.loadRatio != null && ` (rasio ${latestLoad.loadRatio.toFixed(2)})`}
+                  <StatTile
+                    tone="yellow"
+                    label="Threshold pace"
+                    value={formatPace(latestFitness.thresholdPaceSecPerKm)}
+                    unit="/km"
+                  />
+                  <StatTile tone="blue" label="Prediksi 5K" value={formatClock(latestFitness.predictions.fiveKmSeconds)} />
+                  <StatTile tone="blue" label="Prediksi 10K" value={formatClock(latestFitness.predictions.tenKmSeconds)} />
+                  <StatTile
+                    tone="blue"
+                    label="Prediksi half marathon"
+                    value={formatClock(latestFitness.predictions.halfMarathonSeconds)}
+                  />
+                  <StatTile
+                    tone="blue"
+                    label="Prediksi marathon"
+                    value={formatClock(latestFitness.predictions.marathonSeconds)}
+                  />
                 </>
-              ) : undefined
-            }
-          />
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
-            <StatTile
-              label="Threshold pace"
-              value={formatPace(latestFitness.thresholdPaceSecPerKm)}
-              unit="/km"
-            />
-            <StatTile label="Prediksi 5K" value={formatClock(latestFitness.predictions.fiveKmSeconds)} />
-            <StatTile label="Prediksi 10K" value={formatClock(latestFitness.predictions.tenKmSeconds)} />
-            <StatTile
-              label="Prediksi half marathon"
-              value={formatClock(latestFitness.predictions.halfMarathonSeconds)}
-            />
-            <StatTile
-              label="Prediksi marathon"
-              value={formatClock(latestFitness.predictions.marathonSeconds)}
-            />
-          </div>
-        </section>
-      )}
+              )}
+            </div>
+          </section>
 
-      {/* Kondisi tubuh */}
-      <section className="mt-12">
-        <SectionHeader title="Kondisi tubuh" description="Resting HR, kualitas tidur, dan stres harian." />
-        {hasBodyData ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <ChartCard title="Resting HR" subtitle="BPM per hari">
-              <TrendLineChart data={restingHrSeries} color="var(--series-3)" format="integer" unit="bpm" />
-            </ChartCard>
-            <ChartCard title="Sleep score" subtitle="Skor tidur harian">
-              <TrendLineChart data={sleepSeries} color="var(--series-5)" format="integer" />
-            </ChartCard>
-            <ChartCard title="Stress level" subtitle="Rata-rata harian">
-              <TrendLineChart data={stressSeries} color="var(--series-4)" format="integer" />
-            </ChartCard>
-          </div>
-        ) : (
-          <div className="card p-5 text-sm" style={{ color: "var(--text-secondary)" }}>
-            Belum ada data resting HR, tidur, atau stres dari COROS. Grafiknya akan muncul setelah sync
-            berhasil menarik data ini.
-          </div>
-        )}
-      </section>
+          {/* Kondisi tubuh */}
+          <section>
+            <SectionHeader title="Kondisi tubuh" description="Resting HR, kualitas tidur, dan stres harian." />
+            {hasBodyData ? (
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3">
+                <ChartCard title="Resting HR" subtitle="BPM per hari">
+                  <TrendLineChart data={restingHrSeries} color="var(--pink)" format="integer" unit="bpm" />
+                </ChartCard>
+                <ChartCard title="Sleep score" subtitle="Skor tidur harian">
+                  <TrendLineChart data={sleepSeries} color="var(--blue)" format="integer" />
+                </ChartCard>
+                <ChartCard title="Stress level" subtitle="Rata-rata harian">
+                  <TrendLineChart data={stressSeries} color="var(--yellow)" format="integer" />
+                </ChartCard>
+              </div>
+            ) : (
+              <div className="card p-5 text-sm" style={{ color: "var(--text-secondary)" }}>
+                Belum ada data resting HR, tidur, atau stres dari COROS. Grafiknya akan muncul setelah sync
+                berhasil menarik data ini.
+              </div>
+            )}
+          </section>
 
-      {/* Aktivitas terbaru */}
-      <section className="mt-12">
-        <SectionHeader title="Aktivitas terbaru" description="10 lari terakhir." />
-        <div className="card overflow-hidden">
-          <ActivityTable runs={sortedRuns} />
+          {/* Aktivitas terbaru */}
+          <section id="aktivitas" className="scroll-mt-6">
+            <SectionHeader title="Aktivitas terbaru" description="10 lari terakhir." />
+            <div className="overflow-hidden rounded-[22px]" style={{ border: "1px solid var(--border-hairline)" }}>
+              <ActivityTable runs={sortedRuns} />
+            </div>
+          </section>
+
+          <footer className="pt-2 text-xs" style={{ color: "var(--text-muted)" }}>
+            Data dari COROS, disinkronkan otomatis setiap malam.
+          </footer>
         </div>
-      </section>
 
-      <footer
-        className="mt-12 pt-6 text-xs"
-        style={{ borderTop: "1px solid var(--gridline)", color: "var(--text-muted)" }}
-      >
-        Data dari COROS, disinkronkan otomatis setiap malam.
-      </footer>
+        <aside className="flex min-w-0 flex-[1_1_280px] flex-col gap-6 lg:max-w-[340px] lg:border-l lg:border-[var(--border-hairline)] lg:py-1.5 lg:pl-6">
+          <RecentRuns runs={sortedRuns} />
+          <BodyTiles history={bodyHistory} />
+          <CoachNote recommendation={coach.recommendation} />
+        </aside>
+      </div>
+      <Motion />
     </main>
   );
 }

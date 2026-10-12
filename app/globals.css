@@ -2,83 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * One dark theme: a black page, near-black surfaces, and three signal colors
+ * (pink, yellow, blue). Text on a solid signal color is always --on-color;
+ * on dark surfaces, tinted chips use the *-wash background with *-text.
+ */
 :root {
-  color-scheme: light;
-  --page-plane: #f9f9f7;
-  --surface-1: #fcfcfb;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --text-muted: #898781;
-  --gridline: #e1e0d9;
-  --baseline: #c3c2b7;
-  --border-hairline: rgba(11, 11, 11, 0.1);
-  --card-shadow: 0 1px 2px rgba(11, 11, 11, 0.04), 0 4px 12px rgba(11, 11, 11, 0.03);
-  --accent-wash: rgba(42, 120, 214, 0.07);
+  color-scheme: dark;
+  --page-plane: #0a0a0c;
+  --surface-1: #141418; /* app shell */
+  --surface-2: #1c1c22; /* cards inside the shell */
+  --text-primary: #f4f4f6;
+  --text-secondary: #a3a3ae;
+  --text-muted: #8a8a96;
+  --gridline: #2a2a32;
+  --baseline: #3a3a44;
+  --border-hairline: #2a2a32;
+  --on-color: #0a0a0c;
 
-  --series-1: #2a78d6; /* blue */
-  --series-2: #eb6834; /* orange */
-  --series-3: #1baf7a; /* aqua */
-  --series-4: #eda100; /* yellow */
-  --series-5: #4a3aa7; /* violet */
+  --pink: #ff4f9a;
+  --pink-text: #ff7db5;
+  --pink-wash: rgba(255, 79, 154, 0.16);
+  --yellow: #ffd23f;
+  --yellow-text: #ffd23f;
+  --yellow-wash: rgba(255, 210, 63, 0.14);
+  --blue: #3d8bff;
+  --blue-text: #7db2ff;
+  --blue-wash: rgba(61, 139, 255, 0.18);
 
-  --status-good: #0ca30c;
-  --status-good-text: #006300;
-  --status-warning: #fab219;
-  --status-serious: #ec835a;
-  --status-critical: #d03b3b;
+  --status-critical: var(--pink);
 
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --page-plane: #0d0d0d;
-    --surface-1: #1a1a19;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
-    --gridline: #2c2c2a;
-    --baseline: #383835;
-    --border-hairline: rgba(255, 255, 255, 0.1);
-    --card-shadow: none;
-    --accent-wash: rgba(57, 135, 229, 0.12);
-
-    --series-1: #3987e5;
-    --series-2: #d95926;
-    --series-3: #199e70;
-    --series-4: #c98500;
-    --series-5: #9085e9;
-
-    --status-good: #0ca30c;
-    --status-good-text: #0ca30c;
-    --status-warning: #fab219;
-    --status-serious: #ec835a;
-    --status-critical: #d03b3b;
-  }
-}
-
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --page-plane: #0d0d0d;
-  --surface-1: #1a1a19;
-  --text-primary: #ffffff;
-  --text-secondary: #c3c2b7;
-  --text-muted: #898781;
-  --gridline: #2c2c2a;
-  --baseline: #383835;
-  --border-hairline: rgba(255, 255, 255, 0.1);
-  --card-shadow: none;
-  --accent-wash: rgba(57, 135, 229, 0.12);
-
-  --series-1: #3987e5;
-  --series-2: #d95926;
-  --series-3: #199e70;
-  --series-4: #c98500;
-  --series-5: #9085e9;
-
-  --status-good-text: #0ca30c;
 }
 
 body {
@@ -87,27 +42,47 @@ body {
   margin: 0;
 }
 
+/* Outside @layer so classes built at runtime (tone-${tone}) are never purged. */
+.tone-pink {
+  background-color: var(--pink-wash);
+  color: var(--pink-text);
+}
+.tone-yellow {
+  background-color: var(--yellow-wash);
+  color: var(--yellow-text);
+}
+.tone-blue {
+  background-color: var(--blue-wash);
+  color: var(--blue-text);
+}
+.tone-neutral {
+  background-color: var(--gridline);
+  color: var(--text-secondary);
+}
+
 @layer components {
-  .card {
-    @apply min-w-0 rounded-2xl;
+  .app-shell {
+    @apply rounded-[32px];
     background-color: var(--surface-1);
-    border: 1px solid var(--border-hairline);
-    box-shadow: var(--card-shadow);
+    border: 1px solid #25252c;
   }
 
-  .inset {
-    @apply rounded-xl;
-    background-color: var(--page-plane);
-    border: 1px solid var(--border-hairline);
+  .card {
+    @apply min-w-0 rounded-[22px];
+    background-color: var(--surface-2);
+  }
+
+  .tile {
+    @apply min-w-0 rounded-[18px] p-4;
   }
 
   .eyebrow {
-    @apply text-xs font-medium uppercase tracking-wider;
-    color: var(--text-muted);
+    @apply text-xs font-medium;
+    color: var(--text-secondary);
   }
 
   .section-title {
-    @apply text-lg font-semibold tracking-tight;
+    @apply text-lg font-bold;
     color: var(--text-primary);
   }
 
@@ -117,10 +92,7 @@ body {
   }
 
   .pill {
-    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium;
-    background-color: var(--surface-1);
-    border: 1px solid var(--border-hairline);
-    color: var(--text-secondary);
+    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold;
   }
 
   .dot {
@@ -128,14 +100,14 @@ body {
   }
 
   .track {
-    @apply h-2.5 overflow-hidden rounded-full;
+    @apply h-1.5 overflow-hidden rounded-full;
     background-color: var(--gridline);
   }
 
   .btn-primary {
-    @apply inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-opacity;
-    background-color: var(--text-primary);
-    color: var(--surface-1);
+    @apply inline-flex min-h-[44px] w-full items-center justify-center rounded-xl px-4 text-sm font-semibold transition-opacity;
+    background-color: var(--pink);
+    color: var(--on-color);
   }
   .btn-primary:hover:not(:disabled) {
     opacity: 0.85;
@@ -146,34 +118,39 @@ body {
     color: var(--text-muted);
   }
 
-  .field {
-    @apply block w-full rounded-xl px-3.5 py-2.5 text-sm outline-none transition-shadow;
-    background-color: var(--page-plane);
-    border: 1px solid var(--border-hairline);
-    color: var(--text-primary);
-  }
-  .field:focus {
-    border-color: var(--series-1);
-    box-shadow: 0 0 0 3px var(--accent-wash);
-  }
-
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-xs font-medium transition-colors;
-    border: 1px solid var(--border-hairline);
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-xl px-3.5 text-xs font-medium transition-colors;
+    border: 1px solid var(--baseline);
     color: var(--text-secondary);
   }
   .btn-secondary:hover:not(:disabled) {
-    background-color: var(--page-plane);
     color: var(--text-primary);
+    border-color: var(--text-muted);
   }
   .btn-secondary:disabled {
     @apply cursor-not-allowed opacity-50;
   }
 
+  .field {
+    @apply block min-h-[48px] w-full rounded-2xl px-4 text-sm outline-none transition-shadow;
+    background-color: var(--surface-2);
+    border: 1px solid var(--baseline);
+    color: var(--text-primary);
+  }
+  .field:focus {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px var(--pink-wash);
+  }
+
+  .icon-button {
+    @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-colors;
+  }
+
   .btn-primary:focus-visible,
   .btn-secondary:focus-visible,
+  .icon-button:focus-visible,
   .link:focus-visible {
-    outline: 2px solid var(--series-1);
+    outline: 2px solid var(--yellow);
     outline-offset: 2px;
   }
 }

@@ -28,7 +28,7 @@ export function LoadChart({ data }: { data: LoadSnapshot[] }) {
   if (clean.length === 0) return <ChartEmpty text="Belum ada data training load." />;
 
   return (
-    <div className="h-48">
+    <div className="h-44">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={clean} margin={{ top: 0, right: 12, left: 0, bottom: 0 }}>
           <CartesianGrid stroke="var(--gridline)" vertical={false} />
@@ -67,21 +67,21 @@ export function LoadChart({ data }: { data: LoadSnapshot[] }) {
           <Line
             type="monotone"
             dataKey="shortTermLoad"
-            name="Short-term"
-            stroke="var(--series-1)"
-            strokeWidth={2}
+            name="Jangka pendek"
+            stroke="var(--yellow)"
+            strokeWidth={3}
             dot={false}
-            activeDot={dotStyle("var(--series-1)", 5)}
+            activeDot={dotStyle("var(--yellow)", 5)}
             isAnimationActive={false}
           />
           <Line
             type="monotone"
             dataKey="longTermLoad"
-            name="Long-term"
-            stroke="var(--series-2)"
-            strokeWidth={2}
+            name="Jangka panjang"
+            stroke="var(--blue)"
+            strokeWidth={3}
             dot={false}
-            activeDot={dotStyle("var(--series-2)", 5)}
+            activeDot={dotStyle("var(--blue)", 5)}
             isAnimationActive={false}
           />
         </LineChart>

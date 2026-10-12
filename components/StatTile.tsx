@@ -1,37 +1,51 @@
+import type { Tone } from "@/components/GoalCard";
+
+/**
+ * A small figure on a tinted tile. `solid` paints the tile in the full pink
+ * for the one figure worth calling out.
+ */
 export function StatTile({
   label,
   value,
   unit,
-  delta,
+  note,
+  tone = "neutral",
+  solid = false,
 }: {
   label: string;
   value: string;
   unit?: string;
-  delta?: { text: string; tone: "good" | "warning" | "neutral" };
+  note?: string;
+  tone?: Tone;
+  solid?: boolean;
 }) {
-  const deltaColor =
-    delta?.tone === "good"
-      ? "var(--status-good-text)"
-      : delta?.tone === "warning"
-      ? "var(--status-critical)"
-      : "var(--text-muted)";
+  if (solid) {
+    return (
+      <div data-animate="rise" className="tile" style={{ background: "var(--pink)", color: "var(--on-color)" }}>
+        <p className="text-xs">{label}</p>
+        <p className="mt-1 text-2xl font-bold tabular-nums">
+          {value}
+          {unit && <span className="ml-1 text-xs font-medium">{unit}</span>}
+        </p>
+        {note && <p className="text-[11px]">{note}</p>}
+      </div>
+    );
+  }
 
   return (
-    <div className="card flex flex-col p-4">
-      <p className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
-        {label}
-      </p>
-      <p className="mt-2 flex flex-wrap items-baseline gap-x-1" style={{ color: "var(--text-primary)" }}>
-        <span className="text-2xl font-semibold tracking-tight">{value}</span>
+    <div data-animate="rise" className={`tile tone-${tone}`}>
+      <p className="text-xs">{label}</p>
+      <p className="mt-1 text-2xl font-bold tabular-nums" style={{ color: "var(--text-primary)" }}>
+        {value}
         {unit && (
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+          <span className="ml-1 text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
             {unit}
           </span>
         )}
       </p>
-      {delta && (
-        <p className="mt-1 text-xs" style={{ color: deltaColor }}>
-          {delta.text}
+      {note && (
+        <p className="text-[11px]" style={{ color: "var(--text-secondary)" }}>
+          {note}
         </p>
       )}
     </div>

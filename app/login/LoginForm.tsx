@@ -13,7 +13,7 @@ export function LoginForm({ next }: { next: string }) {
     <form action={action} className="mt-6 space-y-4">
       <input type="hidden" name="next" value={next} />
       <label className="block">
-        <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
+        <span className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
           Email
         </span>
         <input
@@ -27,7 +27,7 @@ export function LoginForm({ next }: { next: string }) {
         />
       </label>
       <label className="block">
-        <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
+        <span className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
           Password
         </span>
         <input
@@ -39,7 +39,7 @@ export function LoginForm({ next }: { next: string }) {
         />
       </label>
       {state?.error && (
-        <p role="alert" className="text-sm" style={{ color: "var(--status-critical)" }}>
+        <p role="alert" className="tone-pink rounded-xl px-3.5 py-2.5 text-sm">
           {state.error}
         </p>
       )}

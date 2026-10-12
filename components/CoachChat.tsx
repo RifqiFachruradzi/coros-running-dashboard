@@ -149,23 +149,24 @@ export function CoachChat() {
   }
 
   return (
-    <div className="card flex h-[calc(100dvh-9rem)] min-h-[420px] flex-col overflow-hidden">
+    <div
+      className="flex h-[calc(100dvh-9rem)] min-h-[420px] flex-col overflow-hidden rounded-3xl"
+      style={{ border: "1px solid var(--border-hairline)" }}
+    >
       <div
         className="flex items-center gap-3 px-4 py-3 sm:px-5"
         style={{ borderBottom: "1px solid var(--border-hairline)" }}
       >
         <span
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
-          style={{ backgroundColor: "var(--series-1)", color: "#fff" }}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+          style={{ backgroundColor: "var(--yellow)", color: "var(--on-color)" }}
           aria-hidden
         >
-          AI
+          C
         </span>
         <div className="min-w-0 flex-1">
-          <h1 className="font-semibold leading-tight" style={{ color: "var(--text-primary)" }}>
-            Coach
-          </h1>
-          <p className="truncate text-xs" style={{ color: "var(--text-muted)" }}>
+          <h1 className="font-semibold leading-tight">Coach</h1>
+          <p className="truncate text-xs" style={{ color: "var(--text-secondary)" }}>
             Pelatih lari pribadimu, membaca data COROS
           </p>
         </div>
@@ -179,20 +180,25 @@ export function CoachChat() {
         </button>
       </div>
 
-      <div ref={listRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6" aria-live="polite">
+      <div
+        ref={listRef}
+        className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6"
+        style={{ background: "#0f0f13" }}
+        aria-live="polite"
+      >
         {messages.map((m) => (
           <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
-              className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm sm:max-w-[78%] ${
+              className={`max-w-[88%] rounded-[20px] px-4 py-3 text-sm sm:max-w-[78%] ${
                 m.role === "user" ? "whitespace-pre-wrap rounded-br-md" : "rounded-bl-md"
               }`}
               style={
                 m.role === "user"
-                  ? { backgroundColor: "var(--text-primary)", color: "var(--surface-1)" }
+                  ? { backgroundColor: "var(--pink)", color: "var(--on-color)" }
                   : {
-                      backgroundColor: "var(--page-plane)",
+                      backgroundColor: "var(--surface-2)",
                       color: "var(--text-primary)",
-                      border: `1px solid ${m.error ? "var(--status-critical)" : "var(--border-hairline)"}`,
+                      border: `1px solid ${m.error ? "var(--pink)" : "transparent"}`,
                     }
               }
             >
@@ -204,7 +210,7 @@ export function CoachChat() {
                     <span
                       key={d}
                       className="h-2 w-2 animate-bounce rounded-full"
-                      style={{ backgroundColor: "var(--text-muted)", animationDelay: `${d}ms` }}
+                      style={{ backgroundColor: "var(--yellow)", animationDelay: `${d}ms` }}
                     />
                   ))}
                 </span>
@@ -218,7 +224,13 @@ export function CoachChat() {
         {messages.length <= 1 && (
           <div className="flex flex-wrap gap-2 pt-2">
             {SUGGESTIONS.map((s) => (
-              <button key={s} type="button" onClick={() => send(s)} className="pill hover:opacity-80">
+              <button
+                key={s}
+                type="button"
+                onClick={() => send(s)}
+                className="pill min-h-[40px] px-4 font-medium transition-colors hover:text-[var(--text-primary)]"
+                style={{ border: "1px solid var(--baseline)", color: "var(--text-secondary)" }}
+              >
                 {s}
               </button>
             ))}
@@ -247,13 +259,13 @@ export function CoachChat() {
           }}
           placeholder="Tanya Coach…"
           aria-label="Pesan untuk Coach"
-          className="field max-h-40 flex-1 resize-none"
+          className="field max-h-40 flex-1 resize-none rounded-3xl py-3"
         />
         {busy ? (
           <button
             type="button"
             onClick={() => abortRef.current?.abort()}
-            className="btn-secondary h-10 shrink-0"
+            className="btn-secondary h-12 shrink-0"
           >
             Hentikan
           </button>
@@ -261,7 +273,7 @@ export function CoachChat() {
           <button
             type="submit"
             disabled={!input.trim()}
-            className="btn-primary h-10 w-auto shrink-0"
+            className="btn-primary h-12 w-auto shrink-0 rounded-full px-5"
           >
             Kirim
           </button>

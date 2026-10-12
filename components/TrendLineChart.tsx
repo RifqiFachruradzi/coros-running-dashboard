@@ -2,8 +2,8 @@
 
 import {
   ResponsiveContainer,
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
@@ -43,7 +43,7 @@ const DOMAINS: Record<TrendFormat, [(min: number) => number, (max: number) => nu
 
 export function TrendLineChart({
   data,
-  color = "var(--series-1)",
+  color = "var(--blue)",
   format,
   unit,
 }: {
@@ -58,9 +58,9 @@ export function TrendLineChart({
   if (clean.length === 0) return <ChartEmpty text="Belum ada data yang cukup." />;
 
   return (
-    <div className="h-48">
+    <div className="h-44">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={clean} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+        <AreaChart data={clean} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
           <CartesianGrid stroke="var(--gridline)" vertical={false} />
           <XAxis
             dataKey="x"
@@ -91,16 +91,21 @@ export function TrendLineChart({
             formatter={(value: number) => [`${formatY(value)}${unit ? ` ${unit}` : ""}`, ""]}
             labelFormatter={(label) => formatDay(String(label))}
           />
-          <Line
+          <Area
             type="monotone"
             dataKey="y"
             stroke={color}
-            strokeWidth={2}
+            strokeWidth={3}
+            fill={color}
+            fillOpacity={0.18}
+            // Fill down to the bottom edge. The pace axis is reversed, so its
+            // bottom is the largest (slowest) value.
+            baseValue={format === "pace" ? "dataMax" : "dataMin"}
             dot={dotStyle(color)}
             activeDot={dotStyle(color, 6)}
             isAnimationActive={false}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );
