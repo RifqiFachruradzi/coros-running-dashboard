@@ -161,6 +161,8 @@ async function chat(messages: ChatMessage[]): Promise<string> {
 
 // Models sometimes wrap JSON in a code fence or add a sentence around it.
 function extractJson(text: string): unknown {
+  // Reasoning models (e.g. Hermes) may think out loud in <think> tags first.
+  text = text.replace(/<think>[\s\S]*?<\/think>/gi, "");
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
   const candidate = fenced ? fenced[1] : text;
   const start = candidate.indexOf("{");
