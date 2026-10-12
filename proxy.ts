@@ -1,7 +1,9 @@
 // Login gate for the whole dashboard (it shows health data). Set
 // DASHBOARD_EMAIL and DASHBOARD_PASSWORD to turn it on; see lib/auth.ts.
 // /api/cron is excluded because Vercel Cron authenticates with its own
-// `Authorization: Bearer <CRON_SECRET>` header.
+// `Authorization: Bearer <CRON_SECRET>` header. The app manifest, icons,
+// service worker and offline page are public so a phone can install the app
+// (they contain no personal data).
 
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, isAuthEnabled, verifySessionToken } from "@/lib/auth";
@@ -26,5 +28,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api/cron|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!api/cron|_next/static|_next/image|favicon.ico|manifest.webmanifest|icons/|icon.svg|apple-icon|sw.js|offline.html).*)",
+  ],
 };

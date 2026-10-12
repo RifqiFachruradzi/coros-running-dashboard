@@ -98,6 +98,22 @@ chat.
 COROS hanya mengirim ringkasan per lari (tanpa GPS dan split), jadi rekor
 jarak dihitung dari pace rata-rata.
 
+## Pasang sebagai aplikasi di HP (PWA)
+
+STRIDE+ bisa dipasang ke layar utama dan terbuka layar penuh seperti
+aplikasi biasa, tanpa App Store:
+
+- **iPhone (Safari)**: buka domain Vercel-mu → tombol **Share** → **Add to
+  Home Screen** → **Add**. Buka STRIDE+ dari ikon petir S, lalu login sekali
+  (sesi berlaku 30 hari).
+- **Android (Chrome)**: menu ⋮ → **Install app**.
+
+Manifest ada di `app/manifest.ts`, ikon di `app/apple-icon.png` dan
+`public/icons/`. Service worker (`public/sw.js`) sengaja tidak menyimpan
+halaman apa pun karena berisi data pribadi; ia hanya menampilkan
+`public/offline.html` saat tidak ada koneksi. File-file itu dikecualikan dari
+login di `proxy.ts` supaya HP bisa memasang aplikasinya.
+
 ## Pelatih AI (rekomendasi & program latihan)
 
 Setiap malam (16:30 UTC ≈ 23:30 WIB, setelah cron sync) Vercel Cron
