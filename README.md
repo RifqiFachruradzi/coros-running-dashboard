@@ -44,7 +44,9 @@ Salin dari `.env.example` ke **Settings → Environment Variables**:
 | `GITHUB_REPO` | nama repo ini |
 | `GITHUB_BRANCH` | `main` |
 | `CRON_SECRET` | **wajib** — string acak bebas. Vercel otomatis mengirim ini sebagai header saat memanggil cron. Tanpa ini, `/api/cron/sync` menolak semua request di production. |
-| `DASHBOARD_PASSWORD` | disarankan — password untuk membuka dashboard (browser menampilkan prompt login, username bebas). Kosongkan kalau dashboard boleh publik. |
+| `DASHBOARD_EMAIL` | email untuk login ke dashboard |
+| `DASHBOARD_PASSWORD` | disarankan — password login dashboard (halaman `/login`). Kosongkan kalau dashboard boleh publik. Jangan tulis di kode: repo ini publik. |
+| `AUTH_SECRET` | disarankan — string acak panjang untuk menandatangani cookie sesi. Mengganti password atau nilai ini membuat semua sesi logout. |
 | `WEEKLY_TARGET_KM` | opsional — target jarak mingguan dalam km (default `20`) |
 
 Redeploy setelah menambahkan env vars.
@@ -101,6 +103,14 @@ Tes manual:
 curl https://<domain-vercel-kamu>/api/cron/coach \
   -H "Authorization: Bearer <CRON_SECRET>"
 ```
+
+### Chat dengan Coach
+
+Halaman `/chat` (tombol **Chat dengan Coach** di dashboard) memakai 9Router
+yang sama. Server menambahkan data latihan terbaru, program aktif, dan
+rekomendasi hari ini ke setiap pertanyaan, lalu jawaban di-stream ke browser.
+Riwayat chat disimpan di browser. Set `COACH_CHAT_MODEL` kalau chat mau
+memakai model lain dari rekomendasi harian.
 
 Alternatif tanpa 9Router: routine Claude Code terjadwal dengan prompt di
 [`docs/coach-routine.md`](docs/coach-routine.md).

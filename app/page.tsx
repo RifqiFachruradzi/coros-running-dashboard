@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { isAuthEnabled } from "@/lib/auth";
+import { logout } from "./login/actions";
 import {
   readRuns,
   readFitnessHistory,
@@ -106,7 +109,21 @@ export default async function DashboardPage() {
             · {sortedRuns.length} aktivitas
           </p>
         </div>
-        <SyncStatusBadge status={status} />
+        <div className="flex flex-col items-end gap-2">
+          <SyncStatusBadge status={status} />
+          <div className="flex items-center gap-2">
+            <Link href="/chat" className="btn-secondary">
+              Chat dengan Coach
+            </Link>
+            {isAuthEnabled() && (
+              <form action={logout}>
+                <button type="submit" className="btn-secondary">
+                  Keluar
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
       </header>
 
       {/* Minggu ini */}

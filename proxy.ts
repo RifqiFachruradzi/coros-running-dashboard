@@ -1,30 +1,28 @@
-// Optional HTTP Basic Auth for the whole dashboard (it shows health data).
-// Set DASHBOARD_PASSWORD to turn it on — the browser shows a login prompt and
-// any username works. /api/cron is excluded because Vercel Cron authenticates
-// with its own `Authorization: Bearer <CRON_SECRET>` header.
+// Login gate for the whole dashboard (it shows health data). Set
+// DASHBOARD_EMAIL and DASHBOARD_PASSWORD to turn it on; see lib/auth.ts.
+// /api/cron is excluded because Vercel Cron authenticates with its own
+// `Authorization: Bearer <CRON_SECRET>` header.
 
 import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_COOKIE, isAuthEnabled, verifySessionToken } from "@/lib/auth";
 
-export function proxy(request: NextRequest) {
-  const password = process.env.DASHBOARD_PASSWORD;
-  if (!password) return NextResponse.next();
+export async function proxy(request: NextRequest) {
+  if (!isAuthEnabled()) return NextResponse.next();
 
-  const header = request.headers.get("authorization");
-  if (header?.startsWith("Basic ")) {
-    try {
-      const decoded = atob(header.slice("Basic ".length));
-      if (decoded.slice(decoded.indexOf(":") + 1) === password) {
-        return NextResponse.next();
-      }
-    } catch {
-      // Malformed base64 — fall through to the login prompt.
-    }
+  const { pathname, search } = request.nextUrl;
+  const loggedIn = await verifySessionToken(request.cookies.get(SESSION_COOKIE)?.value);
+
+  if (pathname === "/login") {
+    return loggedIn ? NextResponse.redirect(new URL("/", request.url)) : NextResponse.next();
   }
+  if (loggedIn) return NextResponse.next();
 
-  return new NextResponse("Login diperlukan", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="Dashboard Lari", charset="UTF-8"' },
-  });
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ error: "Login diperlukan" }, { status: 401 });
+  }
+  const login = new URL("/login", request.url);
+  if (pathname !== "/") login.searchParams.set("next", pathname + search);
+  return NextResponse.redirect(login);
 }
 
 export const config = {

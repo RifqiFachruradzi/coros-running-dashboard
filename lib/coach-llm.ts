@@ -76,11 +76,11 @@ export interface CoachInput {
   activeProgram: ActiveProgram | null;
 }
 
-function config() {
+export function llmConfig(model?: string) {
   const baseUrl = process.env.COACH_LLM_BASE_URL?.trim();
   // Tolerate a pasted "Bearer " prefix or stray whitespace/newlines.
   const apiKey = process.env.COACH_LLM_API_KEY?.trim().replace(/^Bearer\s+/i, "");
-  const model = process.env.COACH_LLM_MODEL?.trim();
+  model = model?.trim() || process.env.COACH_LLM_MODEL?.trim();
   if (!baseUrl || !apiKey || !model) {
     throw new Error(
       "COACH_LLM_BASE_URL, COACH_LLM_API_KEY, dan COACH_LLM_MODEL harus di-set di Vercel."
@@ -89,9 +89,9 @@ function config() {
   return { baseUrl: baseUrl.replace(/\/+$/, ""), apiKey, model };
 }
 
-// Only recent history matters for tomorrow's advice, and trimming keeps the
-// prompt small for whichever model 9Router routes to.
-function buildUserPrompt(input: CoachInput, today: string): string {
+// Only recent history matters for advice, and trimming keeps the prompt
+// small for whichever model 9Router routes to. Shared with the coach chat.
+export function buildCoachContext(input: CoachInput, today: string) {
   const tomorrow = addDays(today, 1);
   const since = addDays(today, -56);
   const recent = <T extends { date: string }>(rows: T[]) =>
@@ -109,7 +109,7 @@ function buildUserPrompt(input: CoachInput, today: string): string {
     };
   }
 
-  const data = {
+  return {
     today,
     tomorrow,
     lastRunDate: input.runs.reduce<string | null>(
@@ -122,14 +122,17 @@ function buildUserPrompt(input: CoachInput, today: string): string {
     bodyCondition: recent(input.body).slice(-35),
     activeProgram,
   };
+}
 
+function buildUserPrompt(input: CoachInput, today: string): string {
+  const data = buildCoachContext(input, today);
   return `Hari ini (Asia/Jakarta): ${today}. Data latihan (JSON):\n\n${JSON.stringify(data)}`;
 }
 
 type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 
 async function chat(messages: ChatMessage[]): Promise<string> {
-  const { baseUrl, apiKey, model } = config();
+  const { baseUrl, apiKey, model } = llmConfig();
   const res = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
     headers: {

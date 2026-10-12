@@ -146,6 +146,17 @@ body {
     color: var(--text-muted);
   }
 
+  .field {
+    @apply block w-full rounded-xl px-3.5 py-2.5 text-sm outline-none transition-shadow;
+    background-color: var(--page-plane);
+    border: 1px solid var(--border-hairline);
+    color: var(--text-primary);
+  }
+  .field:focus {
+    border-color: var(--series-1);
+    box-shadow: 0 0 0 3px var(--accent-wash);
+  }
+
   .btn-secondary {
     @apply inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-xs font-medium transition-colors;
     border: 1px solid var(--border-hairline);

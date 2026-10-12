@@ -1,7 +1,7 @@
 "use server";
 
 // Server Actions for the AI coach. They are POSTs to the dashboard page, so
-// proxy.ts's DASHBOARD_PASSWORD check guards them exactly like the page.
+// proxy.ts's login check guards them exactly like the page.
 
 import { refresh } from "next/cache";
 import { todayInJakarta } from "@/lib/aggregate";
