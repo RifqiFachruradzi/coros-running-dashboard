@@ -1,24 +1,345 @@
 [
-  { "date": "2026-08-25", "comment": "Unknown", "shortTermLoad": 0, "longTermLoad": 0, "loadRatio": null },
-  { "date": "2026-08-26", "comment": "Unknown", "shortTermLoad": 0, "longTermLoad": 0, "loadRatio": null },
-  { "date": "2026-08-27", "comment": "Unknown", "shortTermLoad": 0, "longTermLoad": 0, "loadRatio": null },
-  { "date": "2026-08-28", "comment": "Unknown", "shortTermLoad": 0, "longTermLoad": 0, "loadRatio": null },
-  { "date": "2026-08-29", "comment": "Unknown", "shortTermLoad": 0, "longTermLoad": 0, "loadRatio": null },
-  { "date": "2026-08-30", "comment": "Unknown", "shortTermLoad": 0, "longTermLoad": 0, "loadRatio": null },
-  { "date": "2026-08-31", "comment": "Unknown", "shortTermLoad": 0, "longTermLoad": 0, "loadRatio": null },
-  { "date": "2026-09-01", "comment": "Resuming", "shortTermLoad": 21, "longTermLoad": 37, "loadRatio": 0.56 },
-  { "date": "2026-09-02", "comment": "Decreasing", "shortTermLoad": 18, "longTermLoad": 37, "loadRatio": 0.48 },
-  { "date": "2026-09-03", "comment": "Decreasing", "shortTermLoad": 15, "longTermLoad": 37, "loadRatio": 0.40 },
-  { "date": "2026-09-04", "comment": "Decreasing", "shortTermLoad": 13, "longTermLoad": 37, "loadRatio": 0.35 },
-  { "date": "2026-09-05", "comment": "Resuming", "shortTermLoad": 25, "longTermLoad": 42, "loadRatio": 0.59 },
-  { "date": "2026-09-06", "comment": "Resuming", "shortTermLoad": 22, "longTermLoad": 39, "loadRatio": 0.56 },
-  { "date": "2026-09-07", "comment": "Resuming", "shortTermLoad": 19, "longTermLoad": 37, "loadRatio": 0.51 },
-  { "date": "2026-09-08", "comment": "Resuming", "shortTermLoad": 30, "longTermLoad": 41, "loadRatio": 0.73 },
-  { "date": "2026-09-09", "comment": "Resuming", "shortTermLoad": 26, "longTermLoad": 39, "loadRatio": 0.66 },
-  { "date": "2026-09-10", "comment": "Resuming", "shortTermLoad": 22, "longTermLoad": 37, "loadRatio": 0.59 },
-  { "date": "2026-09-11", "comment": "Resuming", "shortTermLoad": 19, "longTermLoad": 37, "loadRatio": 0.51 },
-  { "date": "2026-09-12", "comment": "Decreasing", "shortTermLoad": 16, "longTermLoad": 37, "loadRatio": 0.43 },
-  { "date": "2026-09-13", "comment": "Resuming", "shortTermLoad": 23, "longTermLoad": 38, "loadRatio": 0.60 },
-  { "date": "2026-09-14", "comment": "Resuming", "shortTermLoad": 20, "longTermLoad": 37, "loadRatio": 0.54 },
-  { "date": "2026-09-15", "comment": "Decreasing", "shortTermLoad": 17, "longTermLoad": 37, "loadRatio": 0.45 }
+  {
+    "date": "2026-08-25",
+    "comment": "Unknown",
+    "shortTermLoad": 0,
+    "longTermLoad": 0,
+    "loadRatio": null
+  },
+  {
+    "date": "2026-08-26",
+    "comment": "Unknown",
+    "shortTermLoad": 0,
+    "longTermLoad": 0,
+    "loadRatio": null
+  },
+  {
+    "date": "2026-08-27",
+    "comment": "Unknown",
+    "shortTermLoad": 0,
+    "longTermLoad": 0,
+    "loadRatio": null
+  },
+  {
+    "date": "2026-08-28",
+    "comment": "Unknown",
+    "shortTermLoad": 0,
+    "longTermLoad": 0,
+    "loadRatio": null
+  },
+  {
+    "date": "2026-08-29",
+    "comment": "Unknown",
+    "shortTermLoad": 0,
+    "longTermLoad": 0,
+    "loadRatio": null
+  },
+  {
+    "date": "2026-08-30",
+    "comment": "Unknown",
+    "shortTermLoad": 0,
+    "longTermLoad": 0,
+    "loadRatio": null
+  },
+  {
+    "date": "2026-08-31",
+    "comment": "Unknown",
+    "shortTermLoad": 0,
+    "longTermLoad": 0,
+    "loadRatio": null
+  },
+  {
+    "date": "2026-09-01",
+    "comment": "Resuming",
+    "shortTermLoad": 21,
+    "longTermLoad": 37,
+    "loadRatio": 0.56
+  },
+  {
+    "date": "2026-09-02",
+    "comment": "Decreasing",
+    "shortTermLoad": 18,
+    "longTermLoad": 37,
+    "loadRatio": 0.48
+  },
+  {
+    "date": "2026-09-03",
+    "comment": "Decreasing",
+    "shortTermLoad": 15,
+    "longTermLoad": 37,
+    "loadRatio": 0.4
+  },
+  {
+    "date": "2026-09-04",
+    "comment": "Decreasing",
+    "shortTermLoad": 13,
+    "longTermLoad": 37,
+    "loadRatio": 0.35
+  },
+  {
+    "date": "2026-09-05",
+    "comment": "Resuming",
+    "shortTermLoad": 25,
+    "longTermLoad": 42,
+    "loadRatio": 0.59
+  },
+  {
+    "date": "2026-09-06",
+    "comment": "Resuming",
+    "shortTermLoad": 22,
+    "longTermLoad": 39,
+    "loadRatio": 0.56
+  },
+  {
+    "date": "2026-09-07",
+    "comment": "Resuming",
+    "shortTermLoad": 19,
+    "longTermLoad": 37,
+    "loadRatio": 0.51
+  },
+  {
+    "date": "2026-09-08",
+    "comment": "Resuming",
+    "shortTermLoad": 30,
+    "longTermLoad": 41,
+    "loadRatio": 0.73
+  },
+  {
+    "date": "2026-09-09",
+    "comment": "Resuming",
+    "shortTermLoad": 26,
+    "longTermLoad": 39,
+    "loadRatio": 0.66
+  },
+  {
+    "date": "2026-09-10",
+    "comment": "Resuming",
+    "shortTermLoad": 22,
+    "longTermLoad": 37,
+    "loadRatio": 0.59
+  },
+  {
+    "date": "2026-09-11",
+    "comment": "Resuming",
+    "shortTermLoad": 19,
+    "longTermLoad": 37,
+    "loadRatio": 0.51
+  },
+  {
+    "date": "2026-09-12",
+    "comment": "Decreasing",
+    "shortTermLoad": 16,
+    "longTermLoad": 37,
+    "loadRatio": 0.43
+  },
+  {
+    "date": "2026-09-13",
+    "comment": "Resuming",
+    "shortTermLoad": 23,
+    "longTermLoad": 38,
+    "loadRatio": 0.6
+  },
+  {
+    "date": "2026-09-14",
+    "comment": "Resuming",
+    "shortTermLoad": 20,
+    "longTermLoad": 37,
+    "loadRatio": 0.54
+  },
+  {
+    "date": "2026-09-15",
+    "comment": "Maintaining",
+    "shortTermLoad": 32,
+    "longTermLoad": 40,
+    "loadRatio": 0.8
+  },
+  {
+    "date": "2026-09-16",
+    "comment": "Performance",
+    "shortTermLoad": 27,
+    "longTermLoad": 38,
+    "loadRatio": 0.71
+  },
+  {
+    "date": "2026-09-17",
+    "comment": "Performance",
+    "shortTermLoad": 24,
+    "longTermLoad": 37,
+    "loadRatio": 0.64
+  },
+  {
+    "date": "2026-09-18",
+    "comment": "Performance",
+    "shortTermLoad": 20,
+    "longTermLoad": 37,
+    "loadRatio": 0.54
+  },
+  {
+    "date": "2026-09-19",
+    "comment": "Performance",
+    "shortTermLoad": 24,
+    "longTermLoad": 38,
+    "loadRatio": 0.63
+  },
+  {
+    "date": "2026-09-20",
+    "comment": "Performance",
+    "shortTermLoad": 21,
+    "longTermLoad": 38,
+    "loadRatio": 0.55
+  },
+  {
+    "date": "2026-09-21",
+    "comment": "Decreasing",
+    "shortTermLoad": 18,
+    "longTermLoad": 38,
+    "loadRatio": 0.47
+  },
+  {
+    "date": "2026-09-22",
+    "comment": "Decreasing",
+    "shortTermLoad": 15,
+    "longTermLoad": 38,
+    "loadRatio": 0.39
+  },
+  {
+    "date": "2026-09-23",
+    "comment": "Resuming",
+    "shortTermLoad": 27,
+    "longTermLoad": 40,
+    "loadRatio": 0.67
+  },
+  {
+    "date": "2026-09-24",
+    "comment": "Resuming",
+    "shortTermLoad": 24,
+    "longTermLoad": 39,
+    "loadRatio": 0.61
+  },
+  {
+    "date": "2026-09-25",
+    "comment": "Resuming",
+    "shortTermLoad": 24,
+    "longTermLoad": 38,
+    "loadRatio": 0.63
+  },
+  {
+    "date": "2026-09-26",
+    "comment": "Resuming",
+    "shortTermLoad": 21,
+    "longTermLoad": 38,
+    "loadRatio": 0.55
+  },
+  {
+    "date": "2026-09-27",
+    "comment": "Maintaining",
+    "shortTermLoad": 34,
+    "longTermLoad": 40,
+    "loadRatio": 0.85
+  },
+  {
+    "date": "2026-09-28",
+    "comment": "Performance",
+    "shortTermLoad": 29,
+    "longTermLoad": 39,
+    "loadRatio": 0.74
+  },
+  {
+    "date": "2026-09-29",
+    "comment": "Performance",
+    "shortTermLoad": 25,
+    "longTermLoad": 38,
+    "loadRatio": 0.65
+  },
+  {
+    "date": "2026-09-30",
+    "comment": "Performance",
+    "shortTermLoad": 21,
+    "longTermLoad": 38,
+    "loadRatio": 0.55
+  },
+  {
+    "date": "2026-10-01",
+    "comment": "Performance",
+    "shortTermLoad": 21,
+    "longTermLoad": 38,
+    "loadRatio": 0.55
+  },
+  {
+    "date": "2026-10-02",
+    "comment": "Decreasing",
+    "shortTermLoad": 18,
+    "longTermLoad": 38,
+    "loadRatio": 0.47
+  },
+  {
+    "date": "2026-10-03",
+    "comment": "Resuming",
+    "shortTermLoad": 26,
+    "longTermLoad": 39,
+    "loadRatio": 0.66
+  },
+  {
+    "date": "2026-10-04",
+    "comment": "Resuming",
+    "shortTermLoad": 22,
+    "longTermLoad": 38,
+    "loadRatio": 0.57
+  },
+  {
+    "date": "2026-10-05",
+    "comment": "Resuming",
+    "shortTermLoad": 19,
+    "longTermLoad": 38,
+    "loadRatio": 0.5
+  },
+  {
+    "date": "2026-10-06",
+    "comment": "Resuming",
+    "shortTermLoad": 28,
+    "longTermLoad": 39,
+    "loadRatio": 0.71
+  },
+  {
+    "date": "2026-10-07",
+    "comment": "Resuming",
+    "shortTermLoad": 24,
+    "longTermLoad": 38,
+    "loadRatio": 0.63
+  },
+  {
+    "date": "2026-10-08",
+    "comment": "Resuming",
+    "shortTermLoad": 20,
+    "longTermLoad": 38,
+    "loadRatio": 0.52
+  },
+  {
+    "date": "2026-10-09",
+    "comment": "Decreasing",
+    "shortTermLoad": 18,
+    "longTermLoad": 38,
+    "loadRatio": 0.47
+  },
+  {
+    "date": "2026-10-10",
+    "comment": "Decreasing",
+    "shortTermLoad": 15,
+    "longTermLoad": 38,
+    "loadRatio": 0.39
+  },
+  {
+    "date": "2026-10-11",
+    "comment": "Resuming",
+    "shortTermLoad": 27,
+    "longTermLoad": 39,
+    "loadRatio": 0.69
+  },
+  {
+    "date": "2026-10-12",
+    "comment": "Resuming",
+    "shortTermLoad": 23,
+    "longTermLoad": 39,
+    "loadRatio": 0.58
+  }
 ]
