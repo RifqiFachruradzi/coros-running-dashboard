@@ -27,11 +27,12 @@ export interface TrendPoint {
 
 // Server Components can't pass functions to Client Components, so the page
 // picks a formatter by name and the function itself lives here.
-export type TrendFormat = "pace" | "integer";
+export type TrendFormat = "pace" | "integer" | "decimal";
 
 const FORMATTERS: Record<TrendFormat, (v: number) => string> = {
   pace: (v) => formatPace(v),
   integer: (v) => String(Math.round(v)),
+  decimal: (v) => v.toFixed(2),
 };
 
 // Pad the axis around the data (rounded to clean steps) instead of starting at
@@ -39,6 +40,7 @@ const FORMATTERS: Record<TrendFormat, (v: number) => string> = {
 const DOMAINS: Record<TrendFormat, [(min: number) => number, (max: number) => number]> = {
   pace: [(min) => Math.floor((min - 15) / 30) * 30, (max) => Math.ceil((max + 15) / 30) * 30],
   integer: [(min) => Math.max(0, Math.floor((min - 3) / 5) * 5), (max) => Math.ceil((max + 3) / 5) * 5],
+  decimal: [(min) => Math.max(0, Math.floor((min - 0.05) * 20) / 20), (max) => Math.ceil((max + 0.05) * 20) / 20],
 };
 
 export function TrendLineChart({
@@ -80,7 +82,7 @@ export function TrendLineChart({
             // A lower pace is faster, so flip the axis: up always means better.
             reversed={format === "pace"}
             tickCount={format === "pace" ? 5 : 4}
-            allowDecimals={false}
+            allowDecimals={format === "decimal"}
           />
           <Tooltip
             cursor={lineCursor}

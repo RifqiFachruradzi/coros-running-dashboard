@@ -3,6 +3,7 @@
 // Entrance animations with anime.js, layered on top of server-rendered markup:
 //   data-animate="rise" — fades in and slides up as it scrolls into view
 //   data-animate="bar"  — a progress fill that grows from the left
+//   data-animate="column" — a chart column that grows up from the baseline
 //   data-animate="pop"  — sidebar icons that scale in once on load
 // Everything is fully visible without JavaScript, and nothing moves when the
 // visitor asks for reduced motion.
@@ -30,12 +31,17 @@ export function Motion() {
     }
 
     const targets = Array.from(
-      document.querySelectorAll<HTMLElement>('[data-animate="rise"], [data-animate="bar"]')
+      document.querySelectorAll<HTMLElement>(
+        '[data-animate="rise"], [data-animate="bar"], [data-animate="column"]'
+      )
     );
     for (const el of targets) {
       if (el.dataset.animate === "bar") {
         el.style.transformOrigin = "left center";
         el.style.transform = "scaleX(0)";
+      } else if (el.dataset.animate === "column") {
+        el.style.transformOrigin = "center bottom";
+        el.style.transform = "scaleY(0)";
       } else {
         el.style.opacity = "0";
       }
@@ -50,6 +56,7 @@ export function Motion() {
 
         const rises = visible.filter((el) => el.dataset.animate === "rise");
         const bars = visible.filter((el) => el.dataset.animate === "bar");
+        const columns = visible.filter((el) => el.dataset.animate === "column");
         if (rises.length) {
           running.push(
             animate(rises, {
@@ -67,6 +74,16 @@ export function Motion() {
               scaleX: [0, 1],
               delay: stagger(90, { start: 250 }),
               duration: 1100,
+              ease: "outQuart",
+            })
+          );
+        }
+        if (columns.length) {
+          running.push(
+            animate(columns, {
+              scaleY: [0, 1],
+              delay: stagger(60, { start: 150 }),
+              duration: 900,
               ease: "outQuart",
             })
           );

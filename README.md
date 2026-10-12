@@ -77,6 +77,30 @@ curl https://<domain-vercel-kamu>/api/cron/sync \
 > per-menit). Ubah `schedule` di `vercel.json` sesuai kebutuhan setelah
 > upgrade.
 
+## Fitur
+
+Semua halaman ada di sidebar pink:
+
+| Halaman | Isi |
+|---|---|
+| `/` Ringkasan | Volume mingguan, latihan besok (plus rute tersimpan yang pas), lari terakhir, target, program, tren, rekor, kondisi tubuh |
+| `/riwayat` | Kalender heatmap per bulan, total 12 bulan dan per tahun, semua lari |
+| `/aktivitas/[id]` | Analisis satu lari: pace dan HR dibanding 30 hari terakhir, efisiensi aerobik (meter per detak), peringkat di antara lari berjarak serupa, training load dan kondisi tubuh hari itu, tombol tanya Coach |
+| `/target` | Target jarak mingguan/bulanan/tahunan, jumlah lari per minggu, dan target race (waktu + tanggal, diprediksi dengan rumus Riegel). Status tercapai / sesuai jadwal / tertinggal |
+| `/rute` | Gambar rute di peta (satu arah, loop, atau pulang-pergi), simpan, dan dapat rekomendasi rute untuk jarak latihan besok |
+| `/rekor` | Rekor jarak, waktu, pace, minggu/bulan terjauh, streak, dan riwayat kapan setiap rekor dipecahkan |
+| `/chat` | Chat dengan Coach |
+
+Target dan rute disimpan di Upstash Redis yang sama dengan token COROS
+(`user:goals`, `user:routes`). Tanpa Redis, halamannya tetap tampil tapi tidak
+bisa menyimpan. Target jarak mingguan juga menggantikan `WEEKLY_TARGET_KM` di
+dashboard saat tidak ada program aktif, dan semua target ikut dibaca Coach di
+chat.
+
+COROS hanya mengirim ringkasan per lari (tanpa GPS dan split), jadi rekor
+jarak dihitung dari pace rata-rata, dan jarak rute dihitung garis lurus
+antartitik yang kamu taruh di peta. Peta memakai tile OpenStreetMap dari CARTO.
+
 ## Pelatih AI (rekomendasi & program latihan)
 
 Setiap malam (16:30 UTC ≈ 23:30 WIB, setelah cron sync) Vercel Cron
@@ -106,7 +130,7 @@ curl https://<domain-vercel-kamu>/api/cron/coach \
 
 ### Chat dengan Coach
 
-Halaman `/chat` (tombol **Chat dengan Coach** di dashboard) memakai 9Router
+Halaman `/chat` (ikon chat di sidebar) memakai 9Router
 yang sama. Server menambahkan data latihan terbaru, program aktif, dan
 rekomendasi hari ini ke setiap pertanyaan, lalu jawaban di-stream ke browser.
 Riwayat chat disimpan di browser. Set `COACH_CHAT_MODEL` kalau chat mau

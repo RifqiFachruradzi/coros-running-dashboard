@@ -15,6 +15,8 @@ import {
   readRecommendation,
 } from "@/lib/data-store";
 import { loadActiveProgram } from "@/lib/token-store";
+import { loadGoals } from "@/lib/user-store";
+import { goalProgress } from "@/lib/insights";
 import { todayInJakarta } from "@/lib/aggregate";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +33,7 @@ Tugasmu:
 - Pace dalam data berupa detik per km (avgPaceSecPerKm, thresholdPaceSecPerKm); ubah ke format m:ss saat menyebutnya. Prediksi race dalam detik.
 - Beri langkah yang konkret: jarak, pace, jumlah sesi, kapan istirahat.
 - Kalau data tidak cukup atau sudah lama tidak diperbarui, katakan apa yang kurang. Jangan mengarang angka.
+- Kalau ada goals (target yang dibuat pengguna), kaitkan saranmu dengan target itu dan progresnya.
 
 Aturan keselamatan:
 - Jangan sarankan dua sesi berat (tempo, interval, long run) di hari berurutan.
@@ -116,13 +119,14 @@ class ThinkFilter {
 }
 
 async function coachContext(): Promise<string> {
-  const [runs, fitness, load, body, activeProgram, { recommendation }] = await Promise.all([
+  const [runs, fitness, load, body, activeProgram, { recommendation }, goals] = await Promise.all([
     readRuns(),
     readFitnessHistory(),
     readLoadHistory(),
     readBodyHistory(),
     loadActiveProgram().catch(() => null),
     readRecommendation(),
+    loadGoals(),
   ]);
   const today = todayInJakarta();
   return JSON.stringify({
@@ -141,6 +145,22 @@ async function coachContext(): Promise<string> {
           })),
         }
       : null,
+    // Targets the runner set on the /target page, with progress so far.
+    goals: goals.map((g) => {
+      const p = goalProgress(g, runs, today);
+      return p.type === "race"
+        ? {
+            kind: g.kind,
+            name: g.name ?? null,
+            distanceKm: g.target,
+            targetSeconds: g.targetSeconds,
+            raceDate: g.raceDate,
+            daysLeft: p.daysLeft,
+            predictedSeconds: p.predictedSeconds && Math.round(p.predictedSeconds),
+            status: p.status,
+          }
+        : { kind: g.kind, target: g.target, actual: p.actual, period: `${p.start}..${p.end}`, status: p.status };
+    }),
   });
 }
 

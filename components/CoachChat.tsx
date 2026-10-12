@@ -77,9 +77,11 @@ async function streamReply(
   return text;
 }
 
-export function CoachChat() {
+export function CoachChat({ initialQuestion = "" }: { initialQuestion?: string }) {
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
-  const [input, setInput] = useState("");
+  // A question handed over from another page (e.g. a run's analysis) is
+  // filled in, not sent, so the runner can edit it first.
+  const [input, setInput] = useState(initialQuestion);
   const [busy, setBusy] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const listRef = useRef<HTMLDivElement>(null);

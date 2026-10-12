@@ -3,22 +3,23 @@ import { logout } from "@/app/login/actions";
 import { Icon, type IconName } from "@/components/icons";
 
 const ITEMS: { href: string; label: string; icon: IconName }[] = [
-  { href: "/#ringkasan", label: "Ringkasan", icon: "home" },
-  { href: "/#program", label: "Program latihan", icon: "calendar" },
-  { href: "/#tren", label: "Tren latihan", icon: "chart" },
-  { href: "/#aktivitas", label: "Aktivitas", icon: "list" },
+  { href: "/", label: "Ringkasan", icon: "home" },
+  { href: "/riwayat", label: "Riwayat latihan", icon: "history" },
+  { href: "/target", label: "Target", icon: "target" },
+  { href: "/rute", label: "Rute", icon: "map" },
+  { href: "/rekor", label: "Performa terbaik", icon: "medal" },
   { href: "/chat", label: "Chat dengan Coach", icon: "chat" },
 ];
 
 /**
- * The pink pill menu: a column on wide screens, a row above the content on
- * phones. `active` marks the current page's entry.
+ * The pink pill menu: a column on wide screens, a scrollable row above the
+ * content on phones. `active` is the href of the current section.
  */
 export function Sidebar({ active, showLogout }: { active: string; showLogout: boolean }) {
   return (
     <nav
       aria-label="Menu utama"
-      className="flex w-full shrink-0 items-center gap-2 rounded-3xl p-2 lg:w-[72px] lg:flex-col lg:self-stretch lg:py-5"
+      className="flex w-full shrink-0 items-center gap-2 rounded-3xl p-2 lg:sticky lg:top-6 lg:w-[72px] lg:flex-col lg:self-start lg:py-5"
       style={{ background: "var(--pink)", color: "var(--on-color)" }}
     >
       <span
@@ -28,7 +29,7 @@ export function Sidebar({ active, showLogout }: { active: string; showLogout: bo
       >
         <Icon name="logo" />
       </span>
-      <div className="flex flex-1 items-center justify-between gap-1 overflow-x-auto lg:flex-none lg:flex-col lg:justify-start">
+      <div className="flex flex-1 items-center gap-1 overflow-x-auto lg:flex-none lg:flex-col">
         {ITEMS.map((item) => {
           const current = item.href === active;
           return (
@@ -50,7 +51,7 @@ export function Sidebar({ active, showLogout }: { active: string; showLogout: bo
         })}
       </div>
       {showLogout && (
-        <form action={logout} className="lg:mt-auto">
+        <form action={logout} className="lg:mt-8">
           <button
             type="submit"
             aria-label="Keluar"

@@ -23,9 +23,9 @@ export function RecentRuns({ runs }: { runs: RunActivity[] }) {
     <section className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <PanelTitle icon="pulse">Aktivitas</PanelTitle>
-        <a href="#aktivitas" className="link py-3 text-xs" style={{ color: "var(--text-secondary)" }}>
+        <Link href="/riwayat" className="link py-3 text-xs" style={{ color: "var(--text-secondary)" }}>
           Lihat semua
-        </a>
+        </Link>
       </div>
       {runs.length === 0 ? (
         <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
@@ -34,24 +34,29 @@ export function RecentRuns({ runs }: { runs: RunActivity[] }) {
       ) : (
         <ul className="flex flex-col gap-4">
           {runs.slice(0, 4).map((run, i) => (
-            <li key={run.labelId} data-animate="rise" className="flex items-center gap-3">
-              <span
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-xs font-bold tabular-nums ${
-                  RUN_TONES[i % RUN_TONES.length]
-                }`}
-                aria-hidden
+            <li key={run.labelId} data-animate="rise">
+              <Link
+                href={`/aktivitas/${run.labelId}`}
+                className="link -mx-2 flex items-center gap-3 rounded-2xl p-2 transition-colors hover:bg-[var(--surface-2)]"
               >
-                {run.distanceKm.toFixed(1)}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">
-                  {run.distanceKm.toFixed(2)} km{run.location && ` · ${run.location}`}
-                </p>
-                <p className="text-[11px]" style={{ color: "var(--text-secondary)" }}>
-                  {formatPace(run.avgPaceSecPerKm)}/km
-                  {run.avgHeartRate !== null && ` · ${run.avgHeartRate} bpm`} · {formatDay(run.date)}
-                </p>
-              </div>
+                <span
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-xs font-bold tabular-nums ${
+                    RUN_TONES[i % RUN_TONES.length]
+                  }`}
+                  aria-hidden
+                >
+                  {run.distanceKm.toFixed(1)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">
+                    {run.distanceKm.toFixed(2)} km{run.location && ` · ${run.location}`}
+                  </p>
+                  <p className="text-[11px]" style={{ color: "var(--text-secondary)" }}>
+                    {formatPace(run.avgPaceSecPerKm)}/km
+                    {run.avgHeartRate !== null && ` · ${run.avgHeartRate} bpm`} · {formatDay(run.date)}
+                  </p>
+                </div>
+              </Link>
             </li>
           ))}
         </ul>

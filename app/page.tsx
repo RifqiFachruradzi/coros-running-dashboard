@@ -1,4 +1,3 @@
-import { isAuthEnabled } from "@/lib/auth";
 import {
   readRuns,
   readFitnessHistory,
@@ -21,7 +20,9 @@ import {
 } from "@/lib/aggregate";
 import { programProgress } from "@/lib/coach";
 import { loadDashboardStatus } from "@/lib/token-store";
-import { Sidebar } from "@/components/Sidebar";
+import { AppShell } from "@/components/AppShell";
+import { loadGoals, loadRoutes } from "@/lib/user-store";
+import { suggestRoutes } from "@/lib/insights";
 import { StatTile } from "@/components/StatTile";
 import { ChartCard } from "@/components/ChartCard";
 import { SectionHeader } from "@/components/SectionHeader";
@@ -36,7 +37,6 @@ import { ActiveProgramCard } from "@/components/ActiveProgramCard";
 import { ProgramOfferCard } from "@/components/ProgramOfferCard";
 import { NoProgramCard } from "@/components/NoProgramCard";
 import { RecentRuns, BodyTiles, CoachNote } from "@/components/SidePanel";
-import { Motion } from "@/components/Motion";
 
 export const revalidate = 0; // always read the latest committed data
 
@@ -50,7 +50,8 @@ const MILESTONES = [
   { label: "Marathon", km: 42.2 },
 ];
 
-function weeklyTargetKm(): number {
+function weeklyTargetKm(goalKm: number | undefined): number {
+  if (goalKm) return goalKm;
   const parsed = Number(process.env.WEEKLY_TARGET_KM);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_WEEKLY_TARGET_KM;
 }
@@ -60,19 +61,27 @@ function daysLeftText(days: number): string {
 }
 
 export default async function DashboardPage() {
-  const [runs, fitnessHistory, loadHistory, bodyHistory, status, coach] = await Promise.all([
+  const [runs, fitnessHistory, loadHistory, bodyHistory, status, coach, goals, routes] = await Promise.all([
     readRuns(),
     readFitnessHistory(),
     readLoadHistory(),
     readBodyHistory(),
     loadDashboardStatus(),
     readRecommendation(),
+    loadGoals(),
+    loadRoutes(),
   ]);
 
   const today = todayInJakarta();
   const sortedRuns = [...runs].sort((a, b) => b.startTimestamp - a.startTimestamp);
   const lastRun = sortedRuns[0];
   const last7 = summarize(sortedRuns, 7);
+  const last30 = summarize(sortedRuns, 30);
+  const tomorrowKm = coach.recommendation?.tomorrow.distanceKm ?? null;
+  // Only suggest a saved route when whole laps of it land near tomorrow's distance.
+  const bestRoute = tomorrowKm ? suggestRoutes(routes, tomorrowKm, last30.avgPace, 1)[0] : undefined;
+  const tomorrowRoute =
+    bestRoute && tomorrowKm && Math.abs(bestRoute.diffKm) <= tomorrowKm * 0.3 ? bestRoute : undefined;
   const records = personalRecords(sortedRuns);
   const latestFitness = fitnessHistory[fitnessHistory.length - 1];
   const previousFitness = fitnessHistory[fitnessHistory.length - 2];
@@ -90,7 +99,7 @@ export default async function DashboardPage() {
         daysLeft: programWeek.week.daysLeft,
         weekStart: programWeek.week.start,
       }
-    : weekProgress(sortedRuns, weeklyTargetKm());
+    : weekProgress(sortedRuns, weeklyTargetKm(goals.find((g) => g.kind === "weekly_km")?.target));
   const weekDone = thisWeek.km >= thisWeek.targetKm;
 
   const vo2Delta =
@@ -113,9 +122,7 @@ export default async function DashboardPage() {
   );
 
   return (
-    <main className="min-h-dvh px-3 py-4 sm:px-6 sm:py-8 lg:py-10">
-      <div className="app-shell mx-auto flex max-w-[1360px] flex-col gap-6 p-3 sm:p-5 lg:flex-row lg:flex-wrap lg:items-start">
-        <Sidebar active="/#ringkasan" showLogout={isAuthEnabled()} />
+    <AppShell active="/">
 
         <div id="ringkasan" className="flex min-w-0 flex-[999_1_600px] scroll-mt-6 flex-col gap-8 lg:py-1.5">
           <header className="flex flex-wrap items-center justify-between gap-3">
@@ -164,7 +171,7 @@ export default async function DashboardPage() {
               />
             </div>
             <div className="flex min-w-0 flex-[1_1_260px] flex-col gap-5">
-              <TomorrowCard recommendation={coach.recommendation} />
+              <TomorrowCard recommendation={coach.recommendation} route={tomorrowRoute} />
               <LastRunCard run={lastRun} />
             </div>
           </div>
@@ -386,8 +393,6 @@ export default async function DashboardPage() {
           <BodyTiles history={bodyHistory} />
           <CoachNote recommendation={coach.recommendation} />
         </aside>
-      </div>
-      <Motion />
-    </main>
+    </AppShell>
   );
 }

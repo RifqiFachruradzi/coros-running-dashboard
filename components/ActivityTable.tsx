@@ -1,8 +1,9 @@
+import Link from "next/link";
 import type { RunActivity } from "@/lib/types";
 import { formatClock, formatDay, formatPace } from "@/lib/aggregate";
 
-export function ActivityTable({ runs }: { runs: RunActivity[] }) {
-  const recent = runs.slice(0, 10);
+export function ActivityTable({ runs, limit = 10 }: { runs: RunActivity[]; limit?: number }) {
+  const recent = runs.slice(0, limit);
 
   if (recent.length === 0) {
     return (
@@ -37,7 +38,9 @@ export function ActivityTable({ runs }: { runs: RunActivity[] }) {
               style={{ borderTop: "1px solid var(--gridline)" }}
             >
               <td className={`${cell} ${edgeLeft} whitespace-nowrap font-semibold`}>
-                {formatDay(run.date)}
+                <Link href={`/aktivitas/${run.labelId}`} className="link underline-offset-4 hover:underline">
+                  {formatDay(run.date)}
+                </Link>
                 {run.location && (
                   <span className="block text-xs font-normal sm:hidden" style={{ color: "var(--text-secondary)" }}>
                     {run.location}
