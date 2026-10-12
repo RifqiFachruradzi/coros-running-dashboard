@@ -36,6 +36,7 @@ import { ActiveProgramCard } from "@/components/ActiveProgramCard";
 import { ProgramOfferCard } from "@/components/ProgramOfferCard";
 import { NoProgramCard } from "@/components/NoProgramCard";
 import { RecentRuns, BodyTiles, CoachNote } from "@/components/SidePanel";
+import { Vo2maxCard } from "@/components/Vo2maxCard";
 
 export const revalidate = 0; // always read the latest committed data
 
@@ -381,6 +382,18 @@ export default async function DashboardPage() {
         </div>
 
         <aside className="flex min-w-0 flex-[1_1_280px] flex-col gap-6 lg:max-w-[340px] lg:border-l lg:border-[var(--border-hairline)] lg:py-1.5 lg:pl-6">
+          {latestFitness?.vo2max != null && (
+            <div data-animate="rise">
+              <Vo2maxCard
+                value={latestFitness.vo2max}
+                date={latestFitness.date}
+                previous={
+                  previousFitness?.vo2max != null ? { value: previousFitness.vo2max, date: previousFitness.date } : null
+                }
+                runningLevel={latestFitness.runningLevel}
+              />
+            </div>
+          )}
           <RecentRuns runs={sortedRuns} />
           <BodyTiles history={bodyHistory} />
           <CoachNote recommendation={coach.recommendation} />
