@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { safeNextPath } from "@/lib/auth";
+import { isLoginConfigured, safeNextPath } from "@/lib/auth";
 import { LoginForm } from "./LoginForm";
 
 export const metadata: Metadata = { title: "Masuk — Dashboard Lari" };
@@ -24,7 +24,19 @@ export default async function LoginPage({
         <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
           Dashboard ini berisi data latihan dan kesehatan pribadi.
         </p>
-        <LoginForm next={safeNextPath(next)} />
+        {isLoginConfigured() ? (
+          <LoginForm next={safeNextPath(next)} />
+        ) : (
+          <p
+            role="alert"
+            className="mt-6 rounded-xl p-3 text-sm"
+            style={{ border: "1px solid var(--status-critical)", color: "var(--text-primary)" }}
+          >
+            Login belum dikonfigurasi. Isi <code>DASHBOARD_EMAIL</code> dan{" "}
+            <code>DASHBOARD_PASSWORD</code> di Vercel (Settings → Environment Variables), lalu
+            redeploy.
+          </p>
+        )}
       </div>
     </main>
   );

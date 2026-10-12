@@ -45,7 +45,7 @@ Salin dari `.env.example` ke **Settings → Environment Variables**:
 | `GITHUB_BRANCH` | `main` |
 | `CRON_SECRET` | **wajib** — string acak bebas. Vercel otomatis mengirim ini sebagai header saat memanggil cron. Tanpa ini, `/api/cron/sync` menolak semua request di production. |
 | `DASHBOARD_EMAIL` | email untuk login ke dashboard |
-| `DASHBOARD_PASSWORD` | disarankan — password login dashboard (halaman `/login`). Kosongkan kalau dashboard boleh publik. Jangan tulis di kode: repo ini publik. |
+| `DASHBOARD_PASSWORD` | disarankan — password login dashboard (halaman `/login`). **Wajib** — di production dashboard terkunci sampai ini diisi. Jangan tulis di kode: repo ini publik. |
 | `AUTH_SECRET` | disarankan — string acak panjang untuk menandatangani cookie sesi. Mengganti password atau nilai ini membuat semua sesi logout. |
 | `WEEKLY_TARGET_KM` | opsional — target jarak mingguan dalam km (default `20`) |
 

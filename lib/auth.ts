@@ -1,6 +1,9 @@
 // Single-admin login for the dashboard. The email and password live only in
 // Vercel env vars (this repo is public): DASHBOARD_EMAIL and
-// DASHBOARD_PASSWORD. Login is off while DASHBOARD_PASSWORD is empty.
+// DASHBOARD_PASSWORD. Login is always required in production; with no
+// password set there, nobody can log in (the dashboard stays locked) rather
+// than the dashboard opening up. Only local development without a password
+// skips login.
 //
 // A session is a signed cookie "<expiry ms>.<HMAC>" — no server storage.
 // The HMAC key includes the credentials, so changing the password signs
@@ -13,6 +16,10 @@ export const SESSION_COOKIE = "dashboard_session";
 export const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 
 export function isAuthEnabled(): boolean {
+  return process.env.NODE_ENV === "production" || isLoginConfigured();
+}
+
+export function isLoginConfigured(): boolean {
   return !!process.env.DASHBOARD_PASSWORD;
 }
 
@@ -72,7 +79,8 @@ export async function createSessionToken(): Promise<string> {
 }
 
 export async function verifySessionToken(token: string | undefined): Promise<boolean> {
-  if (!token) return false;
+  // Without a password the HMAC key could be guessable, so trust no session.
+  if (!token || !isLoginConfigured()) return false;
   const [expires, signature] = token.split(".");
   if (!expires || !signature || !(Number(expires) > Date.now())) return false;
   return safeEqual(signature, await hmac(`session:${expires}`));
