@@ -77,11 +77,32 @@ curl https://<domain-vercel-kamu>/api/cron/sync \
 
 ## Pelatih AI (rekomendasi & program latihan)
 
-Routine Claude Code terjadwal membaca `/data` setiap malam (23:30 WIB) dan
-menulis `data/recommendation.json`. Routine ini memakai kuota langganan
-Claude, jadi tidak perlu API key. Isi file itu: status kesiapan, latihan
-untuk besok, dan 2–3 tawaran program (misalnya "6K Goals Routine" atau
-"10K Routine"). Prompt routine dan skemanya ada di
+Setiap malam (16:30 UTC ≈ 23:30 WIB, setelah cron sync) Vercel Cron
+memanggil `/api/cron/coach`. Route ini membaca `/data` dan program aktif di
+Redis, lalu meminta rekomendasi ke model di **9Router** (proxy LLM di VPS
+sendiri, endpoint kompatibel OpenAI). Hasilnya divalidasi dengan
+`lib/coach.ts`. Kalau tidak lolos, error dikirim balik ke model, maksimal 3
+percobaan. Setelah lolos, hasilnya di-commit ke `data/recommendation.json`.
+Isinya: status kesiapan, latihan untuk besok, dan 2–3 tawaran program
+(misalnya "6K Goals Routine" atau "10K Routine"). Prompt-nya ada di
+`lib/coach-llm.ts`.
+
+Env var yang dibutuhkan:
+
+| Var | Keterangan |
+|---|---|
+| `COACH_LLM_BASE_URL` | URL endpoint 9Router, diakhiri `/v1` |
+| `COACH_LLM_API_KEY` | API key dari halaman "Endpoint & Key" 9Router |
+| `COACH_LLM_MODEL` | nama model atau combo di 9Router |
+
+Tes manual:
+
+```
+curl https://<domain-vercel-kamu>/api/cron/coach \
+  -H "Authorization: Bearer <CRON_SECRET>"
+```
+
+Alternatif tanpa 9Router: routine Claude Code terjadwal dengan prompt di
 [`docs/coach-routine.md`](docs/coach-routine.md).
 
 - Klik **Terima program** di dashboard untuk menyimpan program ke Upstash
@@ -90,8 +111,8 @@ untuk besok, dan 2–3 tawaran program (misalnya "6K Goals Routine" atau
   lari di tanggal itu mencapai ≥ 90% jarak rencana.
 - Selama program aktif, kartu target mingguan memakai jarak rencana minggu
   program itu, bukan `WEEKLY_TARGET_KM`.
-- Cron sync menyalin program aktif ke `data/active-program.json`, supaya
-  routine bisa menyesuaikan rekomendasi "latihan besok".
+- Cron sync menyalin program aktif ke `data/active-program.json` untuk
+  routine Claude Code. `/api/cron/coach` membacanya langsung dari Redis.
 - File yang ditulis AI selalu divalidasi (`lib/coach.ts`). Kalau formatnya
   rusak, dashboard menampilkan pesan error dan tidak memakai isinya.
 

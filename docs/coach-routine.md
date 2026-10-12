@@ -1,5 +1,9 @@
 # Routine: Pelatih AI harian
 
+> Jalur utama sekarang adalah `/api/cron/coach` (model via 9Router, lihat
+> README). Routine ini alternatif kalau 9Router tidak dipakai. Jangan
+> jalankan keduanya sekaligus, karena keduanya menulis file yang sama.
+
 Instruksi untuk routine Claude Code terjadwal (`/schedule`) yang menulis
 `data/recommendation.json`. Dashboard membaca file itu untuk menampilkan
 rekomendasi harian dan tawaran program yang bisa diterima pengguna.
