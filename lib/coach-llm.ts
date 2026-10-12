@@ -77,9 +77,10 @@ export interface CoachInput {
 }
 
 function config() {
-  const baseUrl = process.env.COACH_LLM_BASE_URL;
-  const apiKey = process.env.COACH_LLM_API_KEY;
-  const model = process.env.COACH_LLM_MODEL;
+  const baseUrl = process.env.COACH_LLM_BASE_URL?.trim();
+  // Tolerate a pasted "Bearer " prefix or stray whitespace/newlines.
+  const apiKey = process.env.COACH_LLM_API_KEY?.trim().replace(/^Bearer\s+/i, "");
+  const model = process.env.COACH_LLM_MODEL?.trim();
   if (!baseUrl || !apiKey || !model) {
     throw new Error(
       "COACH_LLM_BASE_URL, COACH_LLM_API_KEY, dan COACH_LLM_MODEL harus di-set di Vercel."
