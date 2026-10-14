@@ -4,12 +4,17 @@
 //   data-animate="rise" — fades in and slides up as it scrolls into view
 //   data-animate="bar"  — a progress fill that grows from the left
 //   data-animate="column" — a chart column that grows up from the baseline
-//   data-animate="pop"  — sidebar icons that scale in once on load
+//   data-animate="pop"  — sidebar icons that scale in once per app load
+// Kept short so switching pages feels instant.
 // Everything is fully visible without JavaScript, and nothing moves when the
 // visitor asks for reduced motion.
 
 import { useEffect } from "react";
 import { animate, stagger } from "animejs";
+
+// Every page renders its own menu, so without this the icons would pop again
+// on each page switch.
+let menuPopped = false;
 
 export function Motion() {
   useEffect(() => {
@@ -18,7 +23,8 @@ export function Motion() {
     const running: { revert: () => unknown }[] = [];
 
     const pops = document.querySelectorAll<HTMLElement>('[data-animate="pop"]');
-    if (pops.length) {
+    if (pops.length && !menuPopped) {
+      menuPopped = true;
       running.push(
         animate(pops, {
           opacity: [0, 1],
@@ -61,10 +67,11 @@ export function Motion() {
           running.push(
             animate(rises, {
               opacity: [0, 1],
-              translateY: [18, 0],
-              delay: stagger(70),
-              duration: 700,
-              ease: "outExpo",
+              translateY: [10, 0],
+              // Cap the whole cascade at ~300 ms however many cards appear.
+              delay: stagger(Math.min(40, 300 / rises.length)),
+              duration: 450,
+              ease: "outQuart",
             })
           );
         }
@@ -72,8 +79,8 @@ export function Motion() {
           running.push(
             animate(bars, {
               scaleX: [0, 1],
-              delay: stagger(90, { start: 250 }),
-              duration: 1100,
+              delay: stagger(60, { start: 120 }),
+              duration: 800,
               ease: "outQuart",
             })
           );
@@ -82,8 +89,8 @@ export function Motion() {
           running.push(
             animate(columns, {
               scaleY: [0, 1],
-              delay: stagger(60, { start: 150 }),
-              duration: 900,
+              delay: stagger(40, { start: 100 }),
+              duration: 700,
               ease: "outQuart",
             })
           );

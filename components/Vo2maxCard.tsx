@@ -105,20 +105,20 @@ export function Vo2maxCard({
       running.push(
         animate(segments, {
           strokeDashoffset: [100, 0],
-          delay: stagger(120),
-          duration: 650,
+          delay: stagger(90),
+          duration: 500,
           ease: "outQuad",
         })
       );
       const sweep = { v: MIN };
       running.push(
-        animate(marker, { opacity: [0, 1], delay: 450, duration: 300, ease: "linear" })
+        animate(marker, { opacity: [0, 1], delay: 300, duration: 250, ease: "linear" })
       );
       running.push(
         animate(sweep, {
           v: value,
-          delay: 450,
-          duration: 1600,
+          delay: 300,
+          duration: 1200,
           ease: "outBack(1.3)",
           onUpdate: () => moveMarker(sweep.v),
           onComplete: () => {
@@ -140,8 +140,8 @@ export function Vo2maxCard({
           animate(zoneLabel, {
             opacity: [0, 1],
             translateY: [8, 0],
-            delay: 1300,
-            duration: 500,
+            delay: 1000,
+            duration: 400,
             ease: "outQuad",
           })
         );

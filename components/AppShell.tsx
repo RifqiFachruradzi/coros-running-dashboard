@@ -4,11 +4,9 @@ import { Motion } from "@/components/Motion";
 
 /** The dark rounded app frame with the pink sidebar, shared by every page behind login. */
 export function AppShell({
-  active,
   maxWidth = 1360,
   children,
 }: {
-  active: string;
   maxWidth?: number;
   children: React.ReactNode;
 }) {
@@ -19,7 +17,7 @@ export function AppShell({
         className="app-shell mx-auto flex flex-col gap-6 p-3 sm:p-5 lg:flex-row lg:flex-wrap lg:items-start"
         style={{ maxWidth }}
       >
-        <Sidebar active={active} showLogout={isAuthEnabled()} />
+        <Sidebar showLogout={isAuthEnabled()} />
         {children}
       </div>
       <Motion />

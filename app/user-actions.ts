@@ -4,7 +4,7 @@
 // POSTs to dashboard pages, so proxy.ts's login check guards them. Input
 // from the browser is validated here before anything is stored.
 
-import { refresh } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { todayInJakarta } from "@/lib/aggregate";
 import type { Goal, GoalKind } from "@/lib/insights";
@@ -25,7 +25,9 @@ async function persist(write: () => Promise<void>, failure: string): Promise<Act
     console.error(failure, err);
     return { ok: false, error: `${failure} Coba lagi.` };
   }
-  refresh();
+  // Purge the client cache too: the menu prefetches every page, and those
+  // copies must not show the old program or goals.
+  revalidatePath("/", "layout");
   return { ok: true };
 }
 

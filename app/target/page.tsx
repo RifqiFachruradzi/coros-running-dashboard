@@ -180,7 +180,7 @@ export default async function GoalsPage() {
   const storageReady = isStorageConfigured();
 
   return (
-    <AppShell active="/target">
+    <AppShell>
       <div className="flex min-w-0 flex-[999_1_600px] flex-col gap-8 lg:py-1.5">
         <PageHeader
           eyebrow="Target"

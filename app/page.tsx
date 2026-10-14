@@ -115,7 +115,7 @@ export default async function DashboardPage() {
   );
 
   return (
-    <AppShell active="/">
+    <AppShell>
         <div id="ringkasan" className="flex min-w-0 flex-[999_1_600px] scroll-mt-6 flex-col gap-8 lg:py-1.5">
           <DashboardHeader
             today={today}

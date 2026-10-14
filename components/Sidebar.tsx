@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { logout } from "@/app/login/actions";
 import { Icon, type IconName } from "@/components/icons";
 import { BoltS } from "@/components/Logo";
@@ -11,12 +14,23 @@ const ITEMS: { href: string; label: string; icon: IconName }[] = [
   { href: "/chat", label: "Chat dengan Coach", icon: "chat" },
 ];
 
+/** Which menu entry a path belongs to (a run's analysis lives under Riwayat). */
+function sectionOf(pathname: string): string {
+  if (pathname.startsWith("/aktivitas")) return "/riwayat";
+  return ITEMS.find((i) => i.href !== "/" && pathname.startsWith(i.href))?.href ?? "/";
+}
+
 /**
  * The pink pill menu: a sticky column on wide screens, a bar floating at the
- * bottom of the screen on phones (AppShell leaves room for it). `active` is
- * the href of the current section.
+ * bottom of the screen on phones (AppShell leaves room for it).
+ *
+ * It is a client component so the tapped entry highlights immediately, and
+ * every entry prefetches its full page in the background (`prefetch`), so
+ * switching sections does not wait for the server.
  */
-export function Sidebar({ active, showLogout }: { active: string; showLogout: boolean }) {
+export function Sidebar({ showLogout }: { showLogout: boolean }) {
+  const active = sectionOf(usePathname() ?? "/");
+
   return (
     <nav
       aria-label="Menu utama"
@@ -25,6 +39,7 @@ export function Sidebar({ active, showLogout }: { active: string; showLogout: bo
     >
       <Link
         href="/"
+        prefetch
         aria-label="STRIDE+ beranda"
         className="mx-1 hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl lg:mb-4 lg:flex"
         style={{ background: "var(--on-color)" }}
@@ -38,6 +53,7 @@ export function Sidebar({ active, showLogout }: { active: string; showLogout: bo
             <Link
               key={item.href}
               href={item.href}
+              prefetch
               aria-label={item.label}
               title={item.label}
               aria-current={current ? "page" : undefined}

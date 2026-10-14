@@ -3,7 +3,7 @@
 // Server Actions for the AI coach. They are POSTs to the dashboard page, so
 // proxy.ts's login check guards them exactly like the page.
 
-import { refresh } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { todayInJakarta } from "@/lib/aggregate";
 import { readRecommendation } from "@/lib/data-store";
 import {
@@ -40,7 +40,9 @@ export async function acceptProgram(programId: string): Promise<ActionResult> {
     return { ok: false, error: "Gagal menyimpan program. Coba lagi." };
   }
 
-  refresh();
+  // Purge the client cache too: the menu prefetches every page, and those
+  // copies must not show the old program or goals.
+  revalidatePath("/", "layout");
   return { ok: true };
 }
 
@@ -54,6 +56,8 @@ export async function stopProgram(): Promise<ActionResult> {
     return { ok: false, error: "Gagal menghentikan program. Coba lagi." };
   }
 
-  refresh();
+  // Purge the client cache too: the menu prefetches every page, and those
+  // copies must not show the old program or goals.
+  revalidatePath("/", "layout");
   return { ok: true };
 }

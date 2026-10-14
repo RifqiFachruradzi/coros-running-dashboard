@@ -92,7 +92,7 @@ export default async function ActivityPage({ params }: { params: Promise<{ id: s
     a.efficiency !== null && a.efficiencyBaseline ? (a.efficiency / a.efficiencyBaseline - 1) * 100 : null;
 
   return (
-    <AppShell active="/riwayat">
+    <AppShell>
       <div className="flex min-w-0 flex-[999_1_600px] flex-col gap-8 lg:py-1.5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link href="/riwayat" className="btn-secondary gap-1.5">

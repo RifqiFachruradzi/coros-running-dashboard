@@ -50,8 +50,8 @@ export function ChartReveal({ className, children }: { className?: string; child
       running.push(
         animate(lines, {
           strokeDashoffset: 0,
-          delay: stagger(150, { start: 150 }),
-          duration: 1300,
+          delay: stagger(120, { start: 80 }),
+          duration: 900,
           ease: "inOutQuad",
           // Clear the dash so later re-renders (resize, hover) draw normally.
           onComplete: () => lines.forEach((p) => {
@@ -63,7 +63,7 @@ export function ChartReveal({ className, children }: { className?: string; child
 
       const areas = query<SVGPathElement>(AREAS);
       if (areas.length) {
-        running.push(animate(areas, { opacity: [0, 1], delay: 600, duration: 900, ease: "outQuad" }));
+        running.push(animate(areas, { opacity: [0, 1], delay: 350, duration: 600, ease: "outQuad" }));
       }
 
       const dots = query<SVGElement>(DOTS);
@@ -76,8 +76,8 @@ export function ChartReveal({ className, children }: { className?: string; child
           animate(dots, {
             opacity: [0, 1],
             scale: [0, 1],
-            delay: stagger(1100 / Math.max(dots.length, 1), { start: 250 }),
-            duration: 450,
+            delay: stagger(750 / Math.max(dots.length, 1), { start: 150 }),
+            duration: 350,
             ease: "outBack(2)",
           })
         );

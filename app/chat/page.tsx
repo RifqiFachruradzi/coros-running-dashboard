@@ -37,7 +37,7 @@ export default async function ChatPage({ searchParams }: { searchParams: Promise
   ];
 
   return (
-    <AppShell active="/chat" maxWidth={1240}>
+    <AppShell maxWidth={1240}>
       <aside className="flex min-w-0 flex-col gap-4 lg:w-[280px] lg:shrink-0 lg:self-start">
         <div
           data-animate="rise"

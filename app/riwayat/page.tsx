@@ -53,7 +53,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
   const streak = currentStreak(runs, today);
 
   return (
-    <AppShell active="/riwayat">
+    <AppShell>
       <div className="flex min-w-0 flex-[999_1_600px] flex-col gap-8 lg:py-1.5">
         <PageHeader
           eyebrow="Riwayat latihan"

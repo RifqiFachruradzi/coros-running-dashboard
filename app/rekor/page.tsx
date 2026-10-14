@@ -76,7 +76,7 @@ export default async function RecordsPage() {
   const runHref = (labelId?: string) => (labelId ? `/aktivitas/${labelId}` : undefined);
 
   return (
-    <AppShell active="/rekor">
+    <AppShell>
       <div className="flex min-w-0 flex-[999_1_600px] flex-col gap-8 lg:py-1.5">
         <PageHeader
           eyebrow="Performa terbaik"

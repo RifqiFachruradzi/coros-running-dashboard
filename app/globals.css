@@ -61,6 +61,12 @@ body {
 }
 
 @layer components {
+  /* Loading placeholder: a soft light sweep across a card-colored block. */
+  .skeleton {
+    background: linear-gradient(100deg, var(--surface-2) 30%, #26262e 50%, var(--surface-2) 70%) 0 0 / 300% 100%;
+    animation: skeleton-sweep 1.4s ease-in-out infinite;
+  }
+
   .app-shell {
     @apply rounded-[32px];
     background-color: var(--surface-1);
@@ -152,5 +158,20 @@ body {
   .link:focus-visible {
     outline: 2px solid var(--yellow);
     outline-offset: 2px;
+  }
+}
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
   }
 }
