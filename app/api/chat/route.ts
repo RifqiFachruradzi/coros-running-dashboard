@@ -216,7 +216,7 @@ export async function POST(req: NextRequest) {
         ? "API key 9Router ditolak. Periksa COACH_LLM_API_KEY di Vercel."
         : upstream.status === 404
         ? `Model "${cfg.model}" tidak ditemukan di 9Router.`
-        : `9Router menjawab ${upstream.status}.`;
+        : `9Router menolak permintaan (${upstream.status}, model "${cfg.model}").`;
     return NextResponse.json({ error, detail }, { status: 502 });
   }
 

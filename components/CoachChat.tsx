@@ -62,7 +62,10 @@ async function streamReply(
   }
   if (!res.ok || !res.body) {
     const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || `Gagal (${res.status})`);
+    // Show 9Router's own reason too (e.g. an unknown model or exhausted
+    // quota); a bare status code gives the owner nothing to fix.
+    const detail = typeof data.detail === "string" ? data.detail.trim() : "";
+    throw new Error(`${data.error || `Gagal (${res.status})`}${detail ? `\n\nDetail dari 9Router: ${detail}` : ""}`);
   }
 
   const reader = res.body.getReader();
