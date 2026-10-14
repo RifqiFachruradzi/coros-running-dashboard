@@ -164,6 +164,33 @@ async function coachContext(): Promise<string> {
   });
 }
 
+/** Which server answered: 9Router itself or something in front of it. */
+function answeredBy(res: Response): string {
+  const parts = ["server", "content-type", "x-request-id"]
+    .map((h) => (res.headers.get(h) ? `${h}=${res.headers.get(h)}` : null))
+    .filter(Boolean);
+  return parts.length ? `header: ${parts.join(", ")}` : "tanpa header pengenal";
+}
+
+/** Sends a one-word request to the same model to split "prompt too big" from "model/provider down". */
+async function probeModel(cfg: { baseUrl: string; apiKey: string; model: string }): Promise<string> {
+  try {
+    const res = await fetch(`${cfg.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${cfg.apiKey}` },
+      body: JSON.stringify({ model: cfg.model, stream: false, max_tokens: 5, messages: [{ role: "user", content: "ping" }] }),
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (res.ok) {
+      return "Tes kecil (\"ping\") ke model yang sama BERHASIL, jadi model aktif tapi menolak permintaan sebesar ini: kemungkinan batas konteks/ukuran di provider.";
+    }
+    const body = (await res.text()).trim().slice(0, 200);
+    return `Tes kecil ("ping") ke model yang sama JUGA DITOLAK (${res.status}${body ? `: ${body}` : ", body kosong"}), jadi masalahnya di 9Router/provider: cek combo "${cfg.model}", kuota, atau status provider.`;
+  } catch (err: any) {
+    return `Tes kecil gagal terhubung: ${err?.message ?? err}.`;
+  }
+}
+
 export async function POST(req: NextRequest) {
   let body: any;
   try {
@@ -183,6 +210,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 503 });
   }
 
+  const fullMessages = [
+    {
+      role: "system",
+      content: `${SYSTEM_PROMPT}\n\nHari ini (Asia/Jakarta): ${todayInJakarta()}.\nData latihan pengguna (JSON):\n${await coachContext()}`,
+    },
+    ...messages,
+  ];
+
   let upstream: Response;
   try {
     upstream = await fetch(`${cfg.baseUrl}/chat/completions`, {
@@ -192,13 +227,7 @@ export async function POST(req: NextRequest) {
         model: cfg.model,
         stream: true,
         temperature: 0.5,
-        messages: [
-          {
-            role: "system",
-            content: `${SYSTEM_PROMPT}\n\nHari ini (Asia/Jakarta): ${todayInJakarta()}.\nData latihan pengguna (JSON):\n${await coachContext()}`,
-          },
-          ...messages,
-        ],
+        messages: fullMessages,
       }),
       // Stop generating when the browser disconnects.
       signal: AbortSignal.any([req.signal, AbortSignal.timeout(240_000)]),
@@ -209,7 +238,16 @@ export async function POST(req: NextRequest) {
   }
 
   if (!upstream.ok || !upstream.body) {
-    const detail = (await upstream.text()).slice(0, 300);
+    let detail = (await upstream.text()).trim().slice(0, 300);
+    if (!detail) {
+      // 9Router sometimes rejects with an empty body, which says nothing.
+      // Describe the request and try a tiny one, so the reply tells the
+      // owner whether the prompt is too big or the model/provider is down.
+      const promptChars = fullMessages.reduce((n, m) => n + m.content.length, 0);
+      detail =
+        `body kosong; ${answeredBy(upstream)}; ukuran permintaan ±${Math.round(promptChars / 3.5)} token ` +
+        `(${promptChars} karakter). ${await probeModel(cfg)}`;
+    }
     console.error(`Coach chat: 9Router ${upstream.status} (model "${cfg.model}"): ${detail}`);
     const error =
       upstream.status === 401
