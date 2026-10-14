@@ -1,1 +1,96 @@
-null
+{
+  "program": {
+    "id": "6k-goals-routine-20260915",
+    "title": "6K Goals Routine",
+    "goal": "Bisa lari 6 km tanpa berhenti dengan nyaman dalam 4 minggu, dengan pola 3 sesi per minggu.",
+    "durationWeeks": 4,
+    "sessions": [
+      {
+        "day": 2,
+        "title": "Easy run",
+        "distanceKm": 3,
+        "targetPace": "8:15",
+        "notes": "Santai, masih bisa mengobrol."
+      },
+      {
+        "day": 4,
+        "title": "Easy run",
+        "distanceKm": 3,
+        "targetPace": "8:15",
+        "notes": ""
+      },
+      {
+        "day": 7,
+        "title": "Long run",
+        "distanceKm": 5,
+        "targetPace": "8:30",
+        "notes": "Pace boleh lebih lambat, yang penting tidak berhenti."
+      },
+      {
+        "day": 9,
+        "title": "Easy run",
+        "distanceKm": 3.5,
+        "targetPace": "8:15",
+        "notes": ""
+      },
+      {
+        "day": 11,
+        "title": "Easy run + 4× strides",
+        "distanceKm": 3.5,
+        "targetPace": "8:15",
+        "notes": "Strides 20 detik cepat, jalan 1 menit."
+      },
+      {
+        "day": 14,
+        "title": "Long run",
+        "distanceKm": 5.5,
+        "targetPace": "8:30",
+        "notes": ""
+      },
+      {
+        "day": 16,
+        "title": "Easy run",
+        "distanceKm": 3.5,
+        "targetPace": "8:15",
+        "notes": ""
+      },
+      {
+        "day": 18,
+        "title": "Easy run + 6× 1 menit cepat",
+        "distanceKm": 4,
+        "targetPace": "8:00",
+        "notes": "Bagian cepat di ±7:00/km, jog 2 menit di antaranya."
+      },
+      {
+        "day": 21,
+        "title": "Long run",
+        "distanceKm": 6,
+        "targetPace": "8:30",
+        "notes": "Latihan pertama di jarak target."
+      },
+      {
+        "day": 23,
+        "title": "Easy run",
+        "distanceKm": 3,
+        "targetPace": "8:15",
+        "notes": "Minggu pemulihan sebelum goal run."
+      },
+      {
+        "day": 25,
+        "title": "Easy run + 4× strides",
+        "distanceKm": 3,
+        "targetPace": "8:15",
+        "notes": ""
+      },
+      {
+        "day": 28,
+        "title": "6K goal run",
+        "distanceKm": 6,
+        "targetPace": "8:00",
+        "notes": "Mulai santai, percepat sedikit di 2 km terakhir kalau terasa kuat."
+      }
+    ]
+  },
+  "startDate": "2026-10-12",
+  "acceptedAt": "2026-10-12T06:58:28.079Z"
+}
